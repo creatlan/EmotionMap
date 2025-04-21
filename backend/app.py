@@ -1,55 +1,46 @@
-from flask import Flask, request, jsonify
-from flask_cors import CORS
+import uvicorn
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 from ml_model.emotion_analyzer import analyze_emotion
+from ml_model.clusterizer import cluster_points
 import json
 import os
 from datetime import datetime
+import numpy as np
 
-app = Flask(__name__)
-CORS(app)
+app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 POINTS_FILE = "data/points.json"
+CLUSTER_FILE = "data/clusters.json"
 
-# Обеспечим наличие файла
 if not os.path.exists(POINTS_FILE):
     with open(POINTS_FILE, "w") as f:
         json.dump([], f)
 
-@app.route("/", methods=["GET"])
-def index():
-    return jsonify({
-        "description": "EmotionMap API",
-        "endpoints": {
-            "/analyze": {
-                "method": "POST",
-                "description": "Анализирует текст на эмоции",
-                "request_format": {
-                    "text": "строка текста",
-                    "coords": {"lat": 55.75, "lng": 37.61}
-                },
-                "response_format": {
-                    "label": "эмоция",
-                    "score": "уверенность (0-1)"
-                }
-            },
-            "/points": {
-                "method": "GET",
-                "description": "Возвращает все сохранённые точки"
-            }
-        }
-    })
+class AnalyzeRequest(BaseModel):
+    text: str
+    coords: dict
 
-@app.route("/analyze", methods=["POST"])
-def analyze():
-    data = request.get_json()
-    text = data.get("text", "")
-    coords = data.get("coords", {})
+class AnalyzeResponse(BaseModel):
+    label: str
+    score: float
 
-    label, score = analyze_emotion(text)
+@app.post("/analyze", response_model=AnalyzeResponse)
+async def analyze(request: AnalyzeRequest):
+    label, score = analyze_emotion(request.text)
 
     new_point = {
-        "text": text,
-        "coords": coords,
+        "text": request.text,
+        "coords": request.coords,
         "label": label,
         "score": score,
         "timestamp": datetime.utcnow().isoformat()
@@ -61,15 +52,26 @@ def analyze():
         f.seek(0)
         json.dump(points, f, indent=2)
 
-    return jsonify({"label": label, "score": score})
+    return {"label": label, "score": score}
 
-
-@app.route("/points", methods=["GET"])
-def get_points():
+@app.get("/points")
+async def get_points():
     with open(POINTS_FILE, "r") as f:
         points = json.load(f)
-    return jsonify(points)
+    return points
 
+@app.get("/clusters")
+async def get_clusters(n: int = 5):
+    with open(POINTS_FILE, "r") as f:
+        points = json.load(f)
+    clusters = cluster_points(points, n)
 
-if __name__ == "__main__":
-    app.run(debug=True)
+    def convert_numpy(obj):
+        if isinstance(obj, (np.integer, np.floating)):
+            return obj.item()
+        return obj
+
+    clusters = json.loads(json.dumps(clusters, default=convert_numpy))
+
+    return clusters
+
