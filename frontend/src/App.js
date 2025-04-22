@@ -8,7 +8,7 @@ function App() {
 
   useEffect(() => {
     const loadPoints = async () => {
-      const res = await fetch("http://localhost:5000/points");
+      const res = await fetch("http://localhost:8000/points");
       const data = await res.json();
       setMarkers(data);
     };

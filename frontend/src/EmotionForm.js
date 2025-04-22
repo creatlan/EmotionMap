@@ -6,7 +6,7 @@ const EmotionForm = ({ selectedCoords, onAdd }) => {
   const handleSubmit = async () => {
     if (!selectedCoords || !text) return;
 
-    const res = await fetch("http://localhost:5000/analyze", {
+    const res = await fetch("http://localhost:8000/analyze", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
