@@ -6,4 +6,3 @@ torch
 scikit-learn
 pandas
 numpy
-pymongo

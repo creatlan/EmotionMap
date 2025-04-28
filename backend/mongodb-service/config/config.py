@@ -1,0 +1,4 @@
+MONGODB_HOST = "mongodb"
+MONGODB_PORT = 27017
+MONGODB_DB = "mydatabase"
+MONGODB_COLLECTION = "points"
