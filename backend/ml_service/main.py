@@ -8,6 +8,7 @@ import json
 import os
 from datetime import datetime
 import numpy as np
+from config.logger_config import logger
 
 app = FastAPI()
 
@@ -62,6 +63,8 @@ async def get_points():
 
 @app.get("/clusters")
 async def get_clusters(n: int = 5):
+    logger.info(f"/clusters endpoint called with n={n}")
+    clusters = []
     with open(POINTS_FILE, "r") as f:
         points = json.load(f)
     clusters = cluster_points(points, n)
@@ -72,6 +75,6 @@ async def get_clusters(n: int = 5):
         return obj
 
     clusters = json.loads(json.dumps(clusters, default=convert_numpy))
-
+    logger.info(f"/clusters endpoint returning {len(clusters)} clusters")
     return clusters
 
