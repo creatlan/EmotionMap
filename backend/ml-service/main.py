@@ -9,6 +9,8 @@ import os
 from datetime import datetime
 import numpy as np
 from config.logger_config import logger
+from config import config as config
+import requests
 
 app = FastAPI()
 
@@ -20,14 +22,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-POINTS_FILE = "data/points.json"
-CLUSTER_FILE = "data/clusters.json"
-
-if not os.path.exists(POINTS_FILE):
-    with open(POINTS_FILE, "w") as f:
-        json.dump([], f)
-
 class AnalyzeRequest(BaseModel):
+    username: str
     text: str
     coords: dict
 
@@ -40,6 +36,7 @@ async def analyze(request: AnalyzeRequest):
     label, score = analyze_emotion(request.text)
 
     new_point = {
+        "username": request.username,
         "text": request.text,
         "coords": request.coords,
         "label": label,
@@ -47,34 +44,33 @@ async def analyze(request: AnalyzeRequest):
         "timestamp": datetime.utcnow().isoformat()
     }
 
-    with open(POINTS_FILE, "r+") as f:
-        points = json.load(f)
-        points.append(new_point)
-        f.seek(0)
-        json.dump(points, f, indent=2)
+    response = requests.post(
+        f"http://{config.MONGODB_SERVICE_HOST}:{config.MONGODB_SERVICE_PORT}/point",
+        json=new_point
+    )
+    if response.status_code != 200:
+        logger.error(f"Failed to add point to MongoDB: {response.text}")
+        raise HTTPException(status_code=500, detail="Failed to add point to MongoDB")
 
     return {"label": label, "score": score}
-
-@app.get("/points")
-async def get_points():
-    with open(POINTS_FILE, "r") as f:
-        points = json.load(f)
-    return points
 
 @app.get("/clusters")
 async def get_clusters(n: int = 5):
     logger.info(f"/clusters endpoint called with n={n}")
     clusters = []
-    with open(POINTS_FILE, "r") as f:
-        points = json.load(f)
-    clusters = cluster_points(points, n)
+
+    points = requests.get(
+        f"http://{config.MONGODB_SERVICE_HOST}:{config.MONGODB_SERVICE_PORT}/points"
+    ).json()
+
+    clusters = await cluster_points(points, n)
 
     def convert_numpy(obj):
         if isinstance(obj, (np.integer, np.floating)):
             return obj.item()
         return obj
 
-    clusters = json.loads(json.dumps(clusters, default=convert_numpy))
+    clusters = json.loads(json.dumps(clusters, default=convert_numpy, skipkeys=True))
     logger.info(f"/clusters endpoint returning {len(clusters)} clusters")
     return clusters
 

@@ -5,11 +5,11 @@ class PointsRepository:
         self.db = db
         self.collection = db[config.MONGODB_POINTS_COLLECTION]
 
-    async def get_points(self, username: str):
-        points = await self.collection.find({"username": username}).to_list(length=None)
+    def get_points(self, username: str):
+        points = self.collection.find({"username": username}).to_list(length=None)
         return points
 
-    async def add_point(self, username: str, text: str, coords: dict, label: str, score: float, timestamp: str):
+    def add_point(self, username: str, text: str, coords: dict, label: str, score: float, timestamp: str):
         point = {
             "username": username,
             "text": text,
@@ -18,8 +18,8 @@ class PointsRepository:
             "score": score,
             "timestamp": timestamp
         }
-        await self.collection.insert_one(point)
+        self.collection.insert_one(point)
 
-    async def get_all_points(self):
-        points = await self.collection.find().to_list(length=None)
-        return points
+    def get_all_points(self):
+        points = self.collection.find()
+        return [{**point, "_id": str(point["_id"])} for point in points]

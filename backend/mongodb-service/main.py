@@ -5,6 +5,7 @@ from contextlib import asynccontextmanager
 from config import config as config
 from repositories.points_repository import PointsRepository
 from pydantic import BaseModel
+from bson import ObjectId
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -32,20 +33,20 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 
 @app.get("/points/{username}")
-async def get_points(username: str):
+def get_points(username: str):
     logger.info(f"Fetching points for user: {username}")
     try:
-        points = await app.state.points_repository.get_points(username)
+        points = app.state.points_repository.get_points(username)
         return points
     except Exception as e:
         logger.error(f"Error fetching points: {e}")
         raise HTTPException(status_code=500, detail="Error fetching points")
 
 @app.get("/points")
-async def get_all_points():
+def get_all_points():
     logger.info("Fetching all points")
     try:
-        points = await app.state.points_repository.get_all_points()
+        points = list(app.state.points_repository.get_all_points())
         return points
     except Exception as e:
         logger.error(f"Error fetching all points: {e}")
@@ -60,10 +61,10 @@ class Point(BaseModel):
     timestamp: str
 
 @app.post("/point")
-async def add_point(point: Point):
+def add_point(point: Point):
     logger.info(f"Adding point for user: {point.username}")
     try:
-        await app.state.points_repository.add_point(
+        app.state.points_repository.add_point(
             username=point.username,
             text=point.text,
             coords=point.coords,
@@ -74,4 +75,19 @@ async def add_point(point: Point):
     except Exception as e:
         logger.error(f"Error adding point: {e}")
         raise HTTPException(status_code=500, detail="Error adding point")
-    
+    return {"status": "ok"}
+
+@app.delete("/point/_id")
+def delete_point(_id: str):
+    logger.info(f"Deleting point with ID: {_id}")
+    try:
+        result = app.state.points_repository.collection.delete_one({"_id": ObjectId(_id)})
+        if result.deleted_count == 0:
+            logger.error("Point not found")
+            raise HTTPException(status_code=404, detail="Point not found")
+    except Exception as e:
+        logger.error(f"Error deleting point: {e}")
+        raise HTTPException(status_code=500, detail="Error deleting point")
+    return {"status": "ok"}
+
+
