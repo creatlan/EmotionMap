@@ -44,6 +44,48 @@ This service acts as a wrapper around MongoDB, providing endpoints to manage and
   }
   ```
 
+### `/point/{_id}`
+- **Method**: DELETE
+- **Description**: Deletes a specific point by its ID.
+- **Response**:
+  ```json
+  {
+    "success": true
+  }
+  ```
+
+### `/user/{username}`
+- **Method**: GET
+- **Description**: Retrieves user details.
+- **Response**:
+  ```json
+  {
+    "username": "string",
+    "password": "string"
+  }
+  ```
+
+### `/user/{username}`
+- **Method**: POST
+- **Description**: Creates a new user.
+- **Request Body**:
+  ```json
+  {
+    "username": "string",
+    "password": "string"
+  }
+  ```
+
+### `/user/{username}`
+- **Method**: DELETE
+- **Description**: Deletes a user by their username.
+- **Response**:
+  ```json
+  {
+    "success": true
+  }
+  ```
+
 ## Running the Service
 
 1. Install dependencies:
