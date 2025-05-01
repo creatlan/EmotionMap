@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from "react-leaflet";
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Popup,
+  useMap,
+  useMapEvents
+} from "react-leaflet";
 import L from "leaflet";
 import { getEmotionColor } from "./utils/colors";
 
@@ -12,24 +19,80 @@ function LocationMarker({ setSelectedCoords }) {
   return null;
 }
 
-const MapComponent = ({ selectedCoords, setSelectedCoords, markers, clusterCount, isClusterMode }) => {
+function FlyToSelected({ selectedCoords }) {
+  const map = useMap();
+
+  useEffect(() => {
+    if (selectedCoords) {
+      const timer = setTimeout(() => {
+        map.flyTo([selectedCoords.lat, selectedCoords.lng], 13, {
+          animate: true,
+          duration: 2,
+        });
+      }, 300);
+
+      return () => clearTimeout(timer);
+    }
+  }, [selectedCoords, map]);
+  return null;
+}
+
+function MapControlBridge() {
+  const map = useMap();
+
+  useEffect(() => {
+    window.mapZoomIn = () => map.setZoom(map.getZoom() + 1);
+    window.mapZoomOut = () => map.setZoom(map.getZoom() - 1);
+
+    return () => {
+      delete window.mapZoomIn;
+      delete window.mapZoomOut;
+    };
+  }, [map]);
+
+  return null;
+}
+
+const MapComponent = ({
+  selectedCoords,
+  setSelectedCoords,
+  markers,
+  clusterCount,
+  isClusterMode,
+}) => {
   const [clusters, setClusters] = useState([]);
 
   useEffect(() => {
     if (isClusterMode) {
       const fetchClusters = async () => {
-        const res = await fetch(`http://localhost:8000/clusters?n=${clusterCount}`);
-        const data = await res.json();
-        setClusters(data);
+        try {
+          const res = await fetch(`http://localhost:8000/clusters?n=${clusterCount}`);
+          if (!res.ok) throw new Error(`Server responded with ${res.status}`);
+          const data = await res.json();
+          setClusters(data);
+        } catch (err) {
+          console.error("Error fetching clusters:", err);
+        }
       };
       fetchClusters();
     }
   }, [isClusterMode, clusterCount]);
 
   return (
-    <MapContainer center={[55.75, 37.61]} zoom={12} style={{ height: "400px" }}>
-      <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+    <MapContainer
+      center={[55.75, 37.61]}
+      zoom={12}
+      zoomControl={false}
+      className="map-inner-container"
+    >
+      <MapControlBridge />
+      <TileLayer
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        attribution='&copy; OpenStreetMap contributors'
+        crossOrigin=""
+      />
       <LocationMarker setSelectedCoords={setSelectedCoords} />
+      <FlyToSelected selectedCoords={selectedCoords} />
       {isClusterMode
         ? clusters.map((cluster, i) => (
             <Marker
