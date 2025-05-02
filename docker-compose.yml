@@ -8,13 +8,13 @@ services:
     networks:
       - backend
 
-  # frontend:
-  #   build:
-  #     context: ./frontend
-  #   ports:
-  #     - "3000:80"
-  #   volumes:
-  #     - ./frontend:/app
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "3000:80"
+    volumes:
+      - ./frontend:/app
 
   mongodb:
     image: mongo:6.0
@@ -55,7 +55,7 @@ services:
       - ./backend/redis-service:/app
     networks:
       - backend
-
+      
 networks:
   backend:
     driver: bridge
