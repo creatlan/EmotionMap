@@ -63,7 +63,7 @@ class Point(BaseModel):
     score: float
     timestamp: str
 
-@app.post("/point")
+@app.post("/points")
 def add_point(point: Point):
     logger.info(f"Adding point for user: {point.username}")
     try:
@@ -80,7 +80,7 @@ def add_point(point: Point):
         raise HTTPException(status_code=500, detail="Error adding point")
     return {"status": "ok"}
 
-@app.delete("/point/{_id}")
+@app.delete("/points/{_id}")
 def delete_point(_id: str):
     logger.info(f"Deleting point with ID: {_id}")
     try:
@@ -93,7 +93,7 @@ def delete_point(_id: str):
         raise HTTPException(status_code=500, detail="Error deleting point")
     return {"status": "ok"}
 
-@app.get("/user/{username}")
+@app.get("/users/{username}")
 def get_user(username: str, password: str = None):
     logger.info(f"Fetching user: {username}")
     try:
@@ -113,7 +113,7 @@ def get_user(username: str, password: str = None):
         logger.error(f"Error fetching user: {e}")
         raise HTTPException(status_code=500, detail="Error fetching user")
 
-@app.post("/user/{username}")
+@app.post("/users/{username}")
 def create_user(username: str, password: str):
     logger.info(f"Creating user: {username}")
     try:
@@ -126,7 +126,7 @@ def create_user(username: str, password: str):
         raise HTTPException(status_code=500, detail="Error creating user")
     return {"status": "ok", "user_id": str(user_id)}
 
-@app.delete("/user/{username}")
+@app.delete("/users/{username}")
 def delete_user(username: str):
     logger.info(f"Deleting user: {username}")
     try:

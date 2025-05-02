@@ -2,8 +2,7 @@ import uvicorn
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from ml_model.emotion_analyzer import analyze_emotion
-from ml_model.clusterizer import cluster_points
+from models.clusterizer import cluster_points
 import json
 import os
 from datetime import datetime
@@ -11,8 +10,19 @@ import numpy as np
 from config.logger_config import logger
 from config import config as config
 import requests
+from contextlib import asynccontextmanager
+from models.naive_bayes import NaiveBayesModel
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    logger.info("Starting up...")
+    app.state.naive_bayes_model = NaiveBayesModel()
+    try:
+        yield
+    finally:
+        logger.info("Shutting down...")
+
+app = FastAPI(lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -33,7 +43,7 @@ class AnalyzeResponse(BaseModel):
 
 @app.post("/analyze", response_model=AnalyzeResponse)
 async def analyze(request: AnalyzeRequest):
-    label, score = analyze_emotion(request.text)
+    label, score = app.state.naive_bayes_model.predict(request.text)
 
     new_point = {
         "username": request.username,

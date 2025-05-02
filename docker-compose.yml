@@ -1,12 +1,12 @@
 services:
-  # ml-service:
-  #   build: ./backend/ml-service
-  #   ports:
-  #     - "8000:8000"
-  #   volumes:
-  #     - ./backend/ml-service:/app
-  #   networks:
-  #     - backend
+  ml-service:
+    build: ./backend/ml-service
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend/ml-service:/app
+    networks:
+      - backend
 
   # frontend:
   #   build:
@@ -16,26 +16,26 @@ services:
   #   volumes:
   #     - ./frontend:/app
 
-  # mongodb:
-  #   image: mongo:6.0
-  #   container_name: mongodb
-  #   ports:
-  #     - "27017:27017"
-  #   volumes:
-  #     - mongodb_data:/data/db
-  #   networks:
-  #     - backend
+  mongodb:
+    image: mongo:6.0
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - backend
 
-  # mongodb-service:
-  #   build: ./backend/mongodb-service
-  #   ports:
-  #     - "8001:8001"
-  #   depends_on:
-  #     - mongodb
-  #   volumes:
-  #     - ./backend/mongodb-service:/app
-  #   networks:
-  #     - backend
+  mongodb-service:
+    build: ./backend/mongodb-service
+    ports:
+      - "8001:8001"
+    depends_on:
+      - mongodb
+    volumes:
+      - ./backend/mongodb-service:/app
+    networks:
+      - backend
 
   redis:
     image: redis:6.2

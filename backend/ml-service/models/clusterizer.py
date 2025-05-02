@@ -3,17 +3,6 @@ import pandas as pd
 import numpy as np
 from config.logger_config import logger
 
-example_of_points = [
-    {
-      "coords": {
-        "lat": -7.289842470802628,
-        "lng": 112.75646209716798
-      },
-      "label": "joy",
-      "score": 0.3637967109680176
-    }
-  ]
-
 async def cluster_points(points, n):
     logger.info(f"Clustering {len(points)} points into {n} clusters")
     if not points:
@@ -47,6 +36,6 @@ async def cluster_points(points, n):
             "points": points,
             "mode": mode
         })
-    logger.info(f"Clusters created")
+    logger.info(f"cluster_points ended with {len(result)} clusters")
     return result
 

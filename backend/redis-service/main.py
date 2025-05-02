@@ -17,7 +17,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
-@app.put("/numbers/{key}/{value}")
+@app.put("/values/{key}/{value}")
 async def increment_number(key: str, value: int):
     try:
         app.state.redis_nb.increment_number(key, value)
@@ -25,7 +25,7 @@ async def increment_number(key: str, value: int):
         return JSONResponse(status_code=500, content={"message": str(e)})
     return {"message": "Number incremented successfully"}
 
-@app.put("/hashsets/{key}/{field}/{value}")
+@app.put("/values/{key}/{field}/{value}")
 async def increment_hashset(key: str, field: str, value: int):
     try:
         app.state.redis_nb.increment_hashset(key, field, value)
