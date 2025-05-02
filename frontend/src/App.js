@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
-import MapComponent from "./MapComponent";
-import EmotionForm from "./EmotionForm";
+import { Routes, Route } from "react-router-dom";
+import HomeScreen from "./screens/HomeScreen";
+import AboutScreen from "./screens/AboutScreen"; // (пока можешь создать простой AboutScreen.jsx)
+import LoginScreen from "./screens/LoginScreen"; // (и LoginScreen.jsx)
 
 function App() {
   const [selectedCoords, setSelectedCoords] = useState(null);
   const [markers, setMarkers] = useState([]);
-  const [clusterCount, setClusterCount] = useState(2); // State for slider
-  const [isClusterMode, setIsClusterMode] = useState(false); // State for toggle button
+  const [clusterCount, setClusterCount] = useState(2);
+  const [isClusterMode, setIsClusterMode] = useState(false);
 
   useEffect(() => {
     const loadPoints = async () => {
@@ -26,34 +28,25 @@ function App() {
   };
 
   return (
-    <div>
-      <h1>EmotionMap</h1>
-      <div>
-        <label htmlFor="cluster-slider">Clusters: {clusterCount}</label>
-        <input
-          id="cluster-slider"
-          type="range"
-          min="2"
-          max="10"
-          value={clusterCount}
-          onChange={(e) => setClusterCount(Number(e.target.value))}
-        />
-        <button onClick={toggleMode}>
-          {isClusterMode ? "Switch to Points" : "Switch to Clusters"}
-        </button>
-      </div>
-      <MapComponent
-        selectedCoords={selectedCoords}
-        setSelectedCoords={setSelectedCoords}
-        markers={markers}
-        clusterCount={clusterCount}
-        isClusterMode={isClusterMode}
+    <Routes>
+      <Route
+        path="/"
+        element={
+          <HomeScreen
+            selectedCoords={selectedCoords}
+            setSelectedCoords={setSelectedCoords}
+            markers={markers}
+            handleAddMarker={handleAddMarker}
+            clusterCount={clusterCount}
+            setClusterCount={setClusterCount}
+            isClusterMode={isClusterMode}
+            toggleMode={toggleMode}
+          />
+        }
       />
-      <EmotionForm
-        selectedCoords={selectedCoords}
-        onAdd={handleAddMarker}
-      />
-    </div>
+      <Route path="/about" element={<AboutScreen />} />
+      <Route path="/login" element={<LoginScreen />} />
+    </Routes>
   );
 }
 

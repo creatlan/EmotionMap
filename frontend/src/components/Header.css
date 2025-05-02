@@ -1,0 +1,104 @@
+@import url('https://fonts.googleapis.com/css2?family=Jaro&display=swap');
+
+.nav-bar {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  background: #ffffff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 0;
+  height: 50px;
+  z-index: 1000;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.logo {
+  margin-left: 24px; 
+}
+
+.logo svg {
+    height: 70%;
+    width: auto;
+}
+
+.nav-buttons {
+  display: flex;
+  gap: 12px;
+  height: 70%;
+  align-items: center;
+  margin-right: 2%;
+}
+
+.nav-btn.active {
+  background: #BCB195;}
+
+
+.nav-btn {
+  background: #DBD9D2;
+  border: none;
+  border-radius: 30px;
+  padding: 8px 15px;
+  font-family: 'Jaro', sans-serif;
+  font-size: 22px;
+  color: #162812;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  white-space: nowrap; 
+}
+
+.nav-btn:hover {
+  background: #BCB195;
+  transform: scale(1.05);
+}
+
+@media (max-width: 768px) {
+  .nav-bar {
+    padding: 12px 0px;
+  }
+
+  .logo svg {
+    height: 40px;
+  }
+
+  .nav-buttons {
+    gap: 10px;
+    margin-right: 2%;
+  }
+
+  .nav-btn {
+    padding: 8px 16px;
+    font-size: 16px;
+  }
+}
+
+/* не будет тут адаптивки по телефон */
+@media (max-width: 480px) {
+  .nav-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 8px 12px;
+    height: auto;
+  }
+
+  .logo svg {
+    height: 36px;
+    margin-bottom: 8px;
+  }
+
+  .nav-buttons {
+    flex-wrap: wrap;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .nav-btn {
+    flex: 1 1 auto;
+    text-align: center;
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+}

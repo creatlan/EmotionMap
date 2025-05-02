@@ -1,10 +1,7 @@
 fastapi
 uvicorn
 pydantic
-transformers
-torch
-scikit-learn
 pandas
 numpy
 requests
-hf_xet
+scikit-learn

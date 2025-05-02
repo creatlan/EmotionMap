@@ -2,8 +2,7 @@ import uvicorn
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from ml_model.emotion_analyzer import analyze_emotion
-from ml_model.clusterizer import cluster_points
+from models.clusterizer import cluster_points
 import json
 import os
 from datetime import datetime
@@ -11,8 +10,19 @@ import numpy as np
 from config.logger_config import logger
 from config import config as config
 import requests
+from contextlib import asynccontextmanager
+from models.naive_bayes import NaiveBayesModel
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    logger.info("Starting up...")
+    app.state.naive_bayes_model = NaiveBayesModel()
+    try:
+        yield
+    finally:
+        logger.info("Shutting down...")
+
+app = FastAPI(lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -31,9 +41,13 @@ class AnalyzeResponse(BaseModel):
     label: str
     score: float
 
-@app.post("/analyze", response_model=AnalyzeResponse)
-async def analyze(request: AnalyzeRequest):
-    label, score = analyze_emotion(request.text)
+class TrainRequest(BaseModel):
+    text: str
+    label: str
+
+@app.post("/points", response_model=AnalyzeResponse)
+async def point(request: AnalyzeRequest):
+    label, score = app.state.naive_bayes_model.predict(request.text)
 
     new_point = {
         "username": request.username,
@@ -45,7 +59,7 @@ async def analyze(request: AnalyzeRequest):
     }
 
     response = requests.post(
-        f"http://{config.MONGODB_SERVICE_HOST}:{config.MONGODB_SERVICE_PORT}/point",
+        f"http://{config.MONGODB_SERVICE_HOST}:{config.MONGODB_SERVICE_PORT}/points",
         json=new_point
     )
     if response.status_code != 200:
@@ -53,6 +67,12 @@ async def analyze(request: AnalyzeRequest):
         raise HTTPException(status_code=500, detail="Failed to add point to MongoDB")
 
     return {"label": label, "score": score}
+
+@app.post("/models/train")
+async def train(request: TrainRequest):
+    logger.info(f"Training Naive Bayes model with text: {request.text} and label: {request.label}")
+    app.state.naive_bayes_model.train(request.text, request.label)
+    return {"message": "Model trained successfully"}
 
 @app.get("/clusters")
 async def get_clusters(n: int = 5):
