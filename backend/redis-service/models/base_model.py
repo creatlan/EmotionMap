@@ -9,15 +9,20 @@ class RedisNaiveBayesStorage:
         logger.info("Initializing RedisNaiveBayesStorage")
         self.redis_client = redis_client
 
-    def increment_number(self, key: str, value: str) -> None:
+    def increment_number(self, key: str, value: int) -> None:
         logger.info(f"Incrementing number for key: {key}, value: {value}")
-        self.redis_client.hincrby(key, value, 1)
+        self.redis_client.incrby(key, value)
 
-    def increment_hashset(self, key: str, field: str, value: str) -> None:
+    def increment_hashset(self, key: str, field: str, value: int) -> None:
         logger.info(f"Incrementing value for key: {key}, field: {field}, value: {value}")
         self.redis_client.hincrby(key, field, value)
     
-    def get(self, key: str, field: str) -> int:
+    def get_field(self, key: str, field: str) -> int:
         logger.info(f"Getting value for key: {key}, field: {field}")
         result = self.redis_client.hget(key, field)
+        return int(result) if result is not None else 0
+
+    def get_int(self, key: str) -> int:
+        logger.info(f"Getting integer value for key: {key}")
+        result = self.redis_client.get(key)
         return int(result) if result is not None else 0
