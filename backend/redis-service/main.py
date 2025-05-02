@@ -17,22 +17,34 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
-@app.put("/increment_number/{key}/{value}")
+@app.put("/numbers/{key}/{value}")
 async def increment_number(key: str, value: int):
-    app.state.redis_nb.increment_number(key, value)
+    try:
+        app.state.redis_nb.increment_number(key, value)
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"message": str(e)})
     return {"message": "Number incremented successfully"}
 
-@app.put("/increment_hashset/{key}/{field}/{value}")
+@app.put("/hashsets/{key}/{field}/{value}")
 async def increment_hashset(key: str, field: str, value: int):
-    app.state.redis_nb.increment_hashset(key, field, value)
+    try:
+        app.state.redis_nb.increment_hashset(key, field, value)
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"message": str(e)})
     return {"message": "Hashset incremented successfully"}
 
-@app.get("/get/{key}/{field}")
+@app.get("/values/{key}/{field}")
 async def get_field(key: str, field: str):
-    value = app.state.redis_nb.get_field(key, field)
+    try:
+        value = app.state.redis_nb.get_field(key, field)
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"message": str(e)})
     return {"value": value}
 
-@app.get("/get/{key}")
-async def get_all(key: str):
-    value = app.state.redis_nb.get_int(key)
+@app.get("/values/{key}")
+async def get_value(key: str):
+    try:
+        value = app.state.redis_nb.get_value(key)
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"message": str(e)})
     return {"value": value}

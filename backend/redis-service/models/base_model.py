@@ -22,7 +22,7 @@ class RedisNaiveBayesStorage:
         result = self.redis_client.hget(key, field)
         return int(result) if result is not None else 0
 
-    def get_int(self, key: str) -> int:
+    def get_value(self, key: str) -> int:
         logger.info(f"Getting integer value for key: {key}")
         result = self.redis_client.get(key)
         return int(result) if result is not None else 0
