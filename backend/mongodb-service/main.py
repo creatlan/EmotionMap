@@ -2,8 +2,7 @@ from fastapi import FastAPI, HTTPException
 from pymongo import MongoClient
 from contextlib import asynccontextmanager
 from config import config as config
-from config import logger_config
-logger = logger_config.logger
+from config.logger_config import logger
 from repositories.points_repository import PointsRepository
 from repositories.auth_repository import AuthenticationRepository
 from pydantic import BaseModel

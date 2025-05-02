@@ -1,5 +1,5 @@
 from config import config as config
-from config import logger_config as logger
+from config.logger_config import logger
 from bson import ObjectId
 
 class PointsRepository:
