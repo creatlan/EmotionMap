@@ -4,9 +4,8 @@ This service acts as a wrapper around MongoDB, providing endpoints to manage and
 
 ## Endpoints
 
-### `/points/{username}`
-- **Method**: GET
-- **Description**: Retrieves all points for a specific user.
+### `GET /points/{username}`
+- **Description**: Retrieve all points for a specific user.
 - **Response**:
   ```json
   [
@@ -21,17 +20,15 @@ This service acts as a wrapper around MongoDB, providing endpoints to manage and
   ]
   ```
 
-### `/points`
-- **Method**: GET
-- **Description**: Retrieves all points in the database.
+### `GET /points`
+- **Description**: Retrieve all points in the database.
 - **Response**:
   ```json
   [ ... ]
   ```
 
-### `/point`
-- **Method**: POST
-- **Description**: Adds a new point to the database.
+### `POST /points`
+- **Description**: Add a new point to the database.
 - **Request Body**:
   ```json
   {
@@ -44,19 +41,17 @@ This service acts as a wrapper around MongoDB, providing endpoints to manage and
   }
   ```
 
-### `/point/{_id}`
-- **Method**: DELETE
-- **Description**: Deletes a specific point by its ID.
+### `DELETE /points/{_id}`
+- **Description**: Delete a specific point by its ID.
 - **Response**:
   ```json
   {
-    "success": true
+    "status": "ok"
   }
   ```
 
-### `/user/{username}`
-- **Method**: GET
-- **Description**: Retrieves user details.
+### `GET /users/{username}`
+- **Description**: Retrieve user details.
 - **Response**:
   ```json
   {
@@ -65,9 +60,8 @@ This service acts as a wrapper around MongoDB, providing endpoints to manage and
   }
   ```
 
-### `/user/{username}`
-- **Method**: POST
-- **Description**: Creates a new user.
+### `POST /users/{username}`
+- **Description**: Create a new user.
 - **Request Body**:
   ```json
   {
@@ -76,13 +70,12 @@ This service acts as a wrapper around MongoDB, providing endpoints to manage and
   }
   ```
 
-### `/user/{username}`
-- **Method**: DELETE
-- **Description**: Deletes a user by their username.
+### `DELETE /users/{username}`
+- **Description**: Delete a user by their username.
 - **Response**:
   ```json
   {
-    "success": true
+    "status": "ok"
   }
   ```
 

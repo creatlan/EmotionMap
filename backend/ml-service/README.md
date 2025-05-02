@@ -4,9 +4,8 @@ This service provides machine learning capabilities for emotion analysis and clu
 
 ## Endpoints
 
-### `/analyze`
-- **Method**: POST
-- **Description**: Analyzes the emotion of a given text.
+### `POST /points`
+- **Description**: Analyze emotions in text and add a new point to the MongoDB service.
 - **Request Body**:
   ```json
   {
@@ -23,9 +22,24 @@ This service provides machine learning capabilities for emotion analysis and clu
   }
   ```
 
-### `/clusters`
-- **Method**: GET
-- **Description**: Retrieves clusters of points based on their coordinates.
+### `POST /models/train`
+- **Description**: Train the Naive Bayes model with provided text and label.
+- **Request Body**:
+  ```json
+  {
+    "text": "string",
+    "label": "string"
+  }
+  ```
+- **Response**:
+  ```json
+  {
+    "message": "Model trained successfully"
+  }
+  ```
+
+### `GET /clusters`
+- **Description**: Retrieve clusters of points based on their coordinates.
 - **Query Parameters**:
   - `n` (integer): Number of clusters.
 - **Response**:
@@ -34,8 +48,7 @@ This service provides machine learning capabilities for emotion analysis and clu
     {
       "cluster": "integer",
       "center": { "lat": "float", "lng": "float" },
-      "points": [ ... ],
-      "mode": "string"
+      "points": [ ... ]
     }
   ]
   ```
@@ -50,3 +63,9 @@ This service provides machine learning capabilities for emotion analysis and clu
    ```bash
    uvicorn main:app --host 0.0.0.0 --port 8000
    ```
+
+## Configuration
+
+The service uses the following environment variables for configuration:
+- `MODEL_PATH`: Path to the pre-trained model.
+- `CLUSTER_CONFIG`: Configuration for clustering parameters.
