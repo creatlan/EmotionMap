@@ -4,8 +4,8 @@ This service provides an API for interacting with a Redis database. It supports 
 
 ## Endpoints
 
-### `PUT /increment_number/{key}/{value}`
-- **Description**: Increments a numeric value stored at the given key by the specified value.
+### `PUT /values/{key}/{value}`
+- **Description**: Increment a numeric value stored at the given key.
 - **Parameters**:
   - `key` (string): The key of the number to increment.
   - `value` (integer): The amount to increment the number by.
@@ -16,8 +16,8 @@ This service provides an API for interacting with a Redis database. It supports 
   }
   ```
 
-### `PUT /increment_hashset/{key}/{field}/{value}`
-- **Description**: Increments a numeric value in a hashset field by the specified value.
+### `PUT /values/{key}/{field}/{value}`
+- **Description**: Increment a numeric value in a hashset field.
 - **Parameters**:
   - `key` (string): The key of the hashset.
   - `field` (string): The field within the hashset to increment.
@@ -29,8 +29,8 @@ This service provides an API for interacting with a Redis database. It supports 
   }
   ```
 
-### `GET /get/{key}/{field}`
-- **Description**: Retrieves the value of a specific field in a hashset.
+### `GET /values/{key}/{field}`
+- **Description**: Retrieve the value of a specific field in a hashset.
 - **Parameters**:
   - `key` (string): The key of the hashset.
   - `field` (string): The field within the hashset to retrieve.
@@ -41,8 +41,8 @@ This service provides an API for interacting with a Redis database. It supports 
   }
   ```
 
-### `GET /get/{key}`
-- **Description**: Retrieves the integer value stored at the given key.
+### `GET /values/{key}`
+- **Description**: Retrieve the integer value stored at the given key.
 - **Parameters**:
   - `key` (string): The key to retrieve the value from.
 - **Response**:
@@ -58,7 +58,6 @@ This service provides an API for interacting with a Redis database. It supports 
    ```bash
    pip install -r requirements.txt
    ```
-
 2. Start the service:
    ```bash
    uvicorn main:app --host 0.0.0.0 --port 8002
