@@ -17,8 +17,6 @@ REDIS_SERVICE_ENDPOINTS = {
 INCREMENT_NUMBER = 1
 EMOTIONS_NUMBER = 11
 
-EMOTION_LABELS = ['empty', 'sadness', 'enthusiasm', 'neutral', 
-                       'worry', 'surprise', 'love', 'fun', 'hate',
-                         'happiness', 'boredom', 'relief', 'anger']
+EMOTION_LABELS = ['sadness', 'joy', 'love', 'fear', 'anger', 'surprise']
 
 NB_WC_PREFIX = "nb:wc"

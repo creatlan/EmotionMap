@@ -47,31 +47,7 @@ class TrainRequest(BaseModel):
 
 @app.post("/points", response_model=AnalyzeResponse)
 async def point(request: AnalyzeRequest):
-    # Get emotion probabilities based on existing data
-    emotion_counts = {}
-    total_emotions = 0
-    
-    for label in app.state.naive_bayes_model.labels:
-        try:
-            count_url = f"{config.REDIS_SERVICE_ENDPOINTS['VALUES']}/{config.NB_WC_PREFIX}:{label}:count"
-            emotion_count = requests.get(count_url).json().get("value", 0)
-            emotion_counts[label] = emotion_count
-            total_emotions += emotion_count
-        except Exception as e:
-            logger.error(f"Error fetching emotion count for {label}: {e}")
-            emotion_counts[label] = 0
-    
-    # Add a small value for smoothing if no data exists
-    if total_emotions == 0:
-        for label in app.state.naive_bayes_model.labels:
-            emotion_counts[label] = 1
-        total_emotions = len(app.state.naive_bayes_model.labels)
-    
-    # Get prediction with emotion probabilities
-    label, score = app.state.naive_bayes_model.predict(
-        request.text, 
-        {label: count/total_emotions for label, count in emotion_counts.items()}
-    )
+    label, score = app.state.naive_bayes_model.predict(request.text)
 
     new_point = {
         "username": request.username,
