@@ -7,6 +7,8 @@ from repositories.points_repository import PointsRepository
 from repositories.auth_repository import AuthenticationRepository
 from pydantic import BaseModel
 from bson import ObjectId
+from fastapi.middleware.cors import CORSMiddleware
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -33,6 +35,14 @@ async def lifespan(app: FastAPI):
         app.state.client.close()
 
 app = FastAPI(lifespan=lifespan)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"], 
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/points/{username}")
 def get_points(username: str):

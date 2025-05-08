@@ -7,6 +7,7 @@ import pointsIcon from "../assets/points_clust.svg";
 import clustersIcon from "../assets/circles_clust.svg";
 import plusIcon from "../assets/plus.svg";
 import minusIcon from "../assets/minus.svg";
+import editIcon from "../assets/circle_edit.svg";
 
 
 
@@ -21,12 +22,22 @@ const HomeScreen = ({
   toggleMode,
 }) => {
 
+  const [isNewPoint, setIsNewPoint] = useState(false);
+
   const historyRef = useRef(null);
 
   const [showHistory, setShowHistory] = useState(false);
 
+  const [editPoint, setEditPoint] = useState(null);
+
+  const handleMapClick = (coords) => {
+    setSelectedCoords(coords);
+    setIsNewPoint(true);
+  };
+
   const handleSelectHistory = (coords) => {
     setSelectedCoords(coords);
+    setIsNewPoint(false);
     setShowHistory(false);
   };
 
@@ -63,7 +74,7 @@ const HomeScreen = ({
           </button>
           <input 
             className="input" 
-            placeholder="Type your text" 
+            placeholder="Type your text..." 
             required 
             type="text" 
             onFocus={() => setShowHistory(true)}
@@ -73,41 +84,74 @@ const HomeScreen = ({
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
+          </form>
+
 
         {showHistory && (
           <>
             <div className="history-popup" ref={historyRef}>
               {markers.slice(0, 5).map((point, index) => (
                 <div 
-                  key={index} 
-                  className="history-item"
-                  onClick={() => handleSelectHistory(point.coords)}
-                >
-                  <div className="history-top">
-                    <div className="history-point">Point {index + 1}</div>
-                    <div className="history-label">{point.label} {Math.round(point.score * 100)}%</div>
-                  </div>
-                  <div className="history-text">{point.text}</div>
+                key={index} 
+                className="history-item"
+              >
+                <div className="history-top">
+                  <div className="history-point">Point {index + 1}</div>
+                  <div className="history-label">{point.label} {Math.round(point.score * 100)}%</div>
                 </div>
+                <div className="history-bottom">
+                  <div 
+                    className="history-text" 
+                    onClick={() => handleSelectHistory(point.coords)}
+                  >
+                    {point.text}
+                  </div>
+                  <img 
+                    src={editIcon} 
+                    alt="Edit" 
+                    className="edit-icon" 
+                    onClick={() => {
+                      setEditPoint(point);
+                      setSelectedCoords(point.coords);
+                      setIsNewPoint(true);
+                      setShowHistory(false);
+                    }}                    
+                  />
+                </div>
+              </div>
+              
               ))}
             </div>
           </>
         )}
-        </form>
       </div>
 
       <div className="map-container">
         <MapComponent
           selectedCoords={selectedCoords}
-          setSelectedCoords={setSelectedCoords}
+          setSelectedCoords={handleMapClick}  // handle misclick
+          isNewPoint={isNewPoint} 
           markers={markers}
           clusterCount={clusterCount}
           isClusterMode={isClusterMode}
+          handleAddMarker={handleAddMarker}
         />
       </div>
+      {(selectedCoords && (isNewPoint || editPoint)) && (
+        <EmotionForm
+          selectedCoords={selectedCoords}
+          onAdd={handleAddMarker}
+          onClose={() => {
+            setSelectedCoords(null);
+            setEditPoint(null);
+            setIsNewPoint(false);
+          }}
+          editPoint={editPoint}
+          setEditPoint={setEditPoint}
+        />
+      )}
 
-      // for adding new emotions - upload to button later
-      <EmotionForm selectedCoords={selectedCoords} onAdd={handleAddMarker} />
+
 
       <div className="map-controls">
         <button className="map-button" onClick={() => console.log("Toggle My Points")}>

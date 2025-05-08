@@ -1,0 +1,8 @@
+.map-click-blocker {
+    position: absolute;
+    inset: 0;
+    z-index: 998; 
+    background: transparent;
+    pointer-events: auto; 
+  }
+  

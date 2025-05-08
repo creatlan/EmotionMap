@@ -9,6 +9,9 @@ import {
 } from "react-leaflet";
 import L from "leaflet";
 import { getEmotionColor } from "./utils/colors";
+import AddPointMarker from "./components/AddPointMarker";
+import EmotionForm from "./EmotionForm";
+import "./MapComponent.css";
 
 function LocationMarker({ setSelectedCoords }) {
   useMapEvents({
@@ -59,6 +62,8 @@ const MapComponent = ({
   markers,
   clusterCount,
   isClusterMode,
+  handleAddMarker, 
+  isNewPoint 
 }) => {
   const [clusters, setClusters] = useState([]);
 
@@ -93,6 +98,23 @@ const MapComponent = ({
       />
       <LocationMarker setSelectedCoords={setSelectedCoords} />
       <FlyToSelected selectedCoords={selectedCoords} />
+      {selectedCoords && isNewPoint && !isClusterMode && (
+        <>
+          <div  
+            className="map-click-blocker"
+            onClick={() => setSelectedCoords(null)}
+          />          
+          <AddPointMarker coords={selectedCoords} />
+          <EmotionForm
+            selectedCoords={selectedCoords}
+            onAdd={handleAddMarker}
+            onClose={() => setSelectedCoords(null)}
+          />
+        </>
+      )}
+
+
+
       {isClusterMode
         ? clusters.map((cluster, i) => (
             <Marker
