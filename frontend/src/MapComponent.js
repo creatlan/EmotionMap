@@ -16,7 +16,11 @@ import "./MapComponent.css";
 function LocationMarker({ setSelectedCoords }) {
   useMapEvents({
     click(e) {
-      setSelectedCoords(e.latlng);
+      if (e.latlng && e.latlng.lat !== undefined && e.latlng.lng !== undefined) {
+        setSelectedCoords(e.latlng);
+      } else {
+        console.error("Invalid LatLng object:", e.latlng);
+      }
     },
   });
   return null;
@@ -117,35 +121,39 @@ const MapComponent = ({
 
       {isClusterMode
         ? clusters.map((cluster, i) => (
-            <Marker
-              key={i}
-              position={[cluster.center.lat, cluster.center.lng]}
-              icon={L.divIcon({
-                className: "custom-icon",
-                html: `<div style="background:blue;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;">${cluster.points.length}</div>`
-              })}
-            >
-              <Popup>
-                <b>Cluster ID:</b> {cluster.cluster}<br />
-                <b>Dominant Emotion:</b> {cluster.mode || "N/A"}<br />
-                <b>Points:</b> {cluster.points.length}
-              </Popup>
-            </Marker>
+            cluster.center && cluster.center.lat !== undefined && cluster.center.lng !== undefined && (
+              <Marker
+                key={i}
+                position={[cluster.center.lat, cluster.center.lng]}
+                icon={L.divIcon({
+                  className: "custom-icon",
+                  html: `<div style="background:blue;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;">${cluster.points.length}</div>`
+                })}
+              >
+                <Popup>
+                  <b>Cluster ID:</b> {cluster.cluster}<br />
+                  <b>Dominant Emotion:</b> {cluster.mode || "N/A"}<br />
+                  <b>Points:</b> {cluster.points.length}
+                </Popup>
+              </Marker>
+            )
           ))
         : markers.map((point, i) => (
-            <Marker
-              key={i}
-              position={[point.coords.lat, point.coords.lng]}
-              icon={L.divIcon({
-                className: "custom-icon",
-                html: `<div style="background:${getEmotionColor(point.label)};width:20px;height:20px;border-radius:50%"></div>`
-              })}
-            >
-              <Popup>
-                <b>{point.label}</b> ({Math.round(point.score * 100)}%)<br />
-                {point.text}
-              </Popup>
-            </Marker>
+            point.coords && point.coords.lat !== undefined && point.coords.lng !== undefined && (
+              <Marker
+                key={i}
+                position={[point.coords.lat, point.coords.lng]}
+                icon={L.divIcon({
+                  className: "custom-icon",
+                  html: `<div style="background:${getEmotionColor(point.label)};width:20px;height:20px;border-radius:50%"></div>`
+                })}
+              >
+                <Popup>
+                  <b>{point.label}</b> ({Math.round(point.score * 100)}%)<br />
+                  {point.text}
+                </Popup>
+              </Marker>
+            )
           ))}
     </MapContainer>
   );

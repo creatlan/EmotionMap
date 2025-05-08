@@ -30,25 +30,54 @@ const EmotionForm = ({ selectedCoords, onAdd, onClose, editPoint, setEditPoint }
       return;
     }
 
-    const data = await res.json();
-
-    const newPoint = {
-      ...editPoint,
-      text,
-      coords: selectedCoords,
-      label: data.label,
-      score: data.score,
-      timestamp: new Date().toISOString(),
-    };
-
-    // если редактируем — удаляем старую точку
+    const data = await res.json();    const timestamp = new Date().toISOString();
+    
     if (editPoint?._id) {
-      await fetch(`http://localhost:8001/points/${editPoint._id}`, {
-        method: "DELETE",
+      // Если редактируем существующую точку - используем PUT запрос для обновления
+      const updatedPoint = {
+        text,
+        coords: selectedCoords,
+        label: data.label,
+        score: data.score,
+        timestamp: timestamp
+      };
+      
+      const updateRes = await fetch(`http://localhost:8001/points/${editPoint._id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedPoint),
       });
+      
+      if (!updateRes.ok) {
+        alert("Error while updating point");
+        return;
+      }
+      
+      // Обновляем объект точки с сохранением ID и предыдущих данных
+      const updatedCompletePoint = {
+        ...editPoint,
+        text,
+        coords: selectedCoords,
+        label: data.label,
+        score: data.score,
+        timestamp: timestamp
+      };
+      
+      onAdd(updatedCompletePoint);
+    } else {
+      // Если создаем новую точку
+      const newPoint = {
+        username: "test_user",
+        text,
+        coords: selectedCoords,
+        label: data.label,
+        score: data.score,
+        timestamp: timestamp
+      };
+      
+      onAdd(newPoint);
     }
-
-    onAdd(newPoint);
+    
     setText("");
     setEditPoint(null);
     onClose?.();

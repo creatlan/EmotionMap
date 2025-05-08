@@ -4,5 +4,15 @@
     z-index: 998; 
     background: transparent;
     pointer-events: auto; 
-  }
-  
+}
+
+.leaflet-control-attribution {
+  display: block !important;
+  white-space: nowrap;
+  font-size: 0 !important; 
+}
+
+.leaflet-control-attribution::after {
+  content: "Leaflet | © OpenStreetMap contributors";
+  font-size: 11px !important;
+}

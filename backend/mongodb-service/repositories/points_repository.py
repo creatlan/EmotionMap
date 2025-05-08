@@ -33,3 +33,24 @@ class PointsRepository:
         logger.info(f"Removing point with ID: {point_id}")
         result = self.collection.delete_one({"_id": point_id})
         return result.deleted_count > 0
+        
+    def update_point(self, point_id: ObjectId, text: str, coords: dict, label: str, score: float, timestamp: str):
+        """
+        Update an existing point with the given ID.
+        Returns True if the point was updated, False otherwise.
+        """
+        logger.info(f"Updating point with ID: {point_id}")
+        update_data = {
+            "text": text,
+            "coords": coords,
+            "label": label,
+            "score": score,
+            "timestamp": timestamp
+        }
+        
+        result = self.collection.update_one(
+            {"_id": point_id},
+            {"$set": update_data}
+        )
+        
+        return result.modified_count > 0

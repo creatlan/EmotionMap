@@ -1,9 +1,5 @@
 from config.logger_config import logger
 
-# nb:nc:emotion -> number hashset for each emotion
-# nb:total -> total number of messages
-# nb:class:emotion -> number of messages for each class (emotion)
-
 class RedisNaiveBayesStorage:
     def __init__(self, redis_client):
         logger.info("Initializing RedisNaiveBayesStorage")

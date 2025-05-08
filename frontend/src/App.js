@@ -24,9 +24,19 @@ function App() {
     loadPoints();
   }, []);
   
-
   const handleAddMarker = (point) => {
-    setMarkers((prev) => [...prev, point]);
+    // Проверяем, это обновление или создание новой точки
+    if (point._id) {
+      // Обновление существующей точки
+      setMarkers(prev => 
+        prev.map(marker => 
+          marker._id === point._id ? point : marker
+        )
+      );
+    } else {
+      // Добавление новой точки
+      setMarkers(prev => [...prev, point]);
+    }
   };
 
   const toggleMode = () => {
