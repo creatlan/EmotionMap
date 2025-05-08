@@ -1,0 +1,112 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap');
+
+.emotion-form-wrapper {
+  position: absolute;
+  inset: 0;
+  z-index: 999;
+  pointer-events: none;
+}
+
+.click-blocker {
+  position: absolute;
+  inset: 0;
+  pointer-events: auto;
+  background: transparent;
+}
+
+.emotion-form-container {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  pointer-events: auto;
+  width: 260px;
+  padding: 24px 16px 16px;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  font-family: 'Roboto Mono', monospace;
+}
+
+
+.input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.input-field {
+  width: 100%;
+  font-size: 14px;
+  padding: 14px 36px 8px 15px;
+  border: none;
+  border-bottom: 2px solid #9B9B9B;
+  background: transparent;
+  color: #9B9B9B;
+  resize: none;
+  overflow-y: auto;
+  max-height: 66px;
+  line-height: 1.4;
+  box-sizing: border-box;
+  font-family: 'Roboto Mono', monospace;
+  transition: border-color 0.3s ease-in-out;
+}
+.input-field:focus {
+  outline: none;
+  border-bottom: 2px solid #5c8374;
+}
+
+.floating-label {
+  position: absolute;
+  left: 12px;
+  top: 14px;
+  color: #757575;
+  font-size: 14px;
+  transition: all 0.3s ease-in-out;
+  pointer-events: none;
+  font-family: 'Roboto Mono', monospace;
+}
+.floating-label.active,
+.input-field:focus + .floating-label {
+  top: -12px;
+  font-size: 11px;
+  color: #5c8374;
+  background: white;
+  padding: 0 4px;
+}
+
+.floating-close {
+  position: absolute;
+  right: 23px;
+  top: 10px;
+  font-size: 14px;
+  color: #aaa;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: 'Roboto Mono', monospace;
+  transition: color 0.3s ease-in-out;
+  z-index: 10; 
+}
+.floating-close:hover {
+  color: #333;
+}
+
+
+.emotion-button {
+  border: none;
+  background: #F2EFE9;
+  color: #757575;
+  padding: 8px 14px;
+  border-radius: 30px;
+  font-weight: bold;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+.emotion-button:hover {
+  background: #DBD9D2;
+}

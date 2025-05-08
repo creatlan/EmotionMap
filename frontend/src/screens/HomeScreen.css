@@ -62,8 +62,12 @@
   }
 
   .input {
-    font-size: 1.1rem;
+    font-size: 14px;
     font-family: 'Roboto', monospace;
+
+    line-height: 1.6;
+    letter-spacing: 0.05em;
+    
     background-color: transparent;
     width: 100%;
     height: 100%;
@@ -71,7 +75,7 @@
     padding-block: 0.7em;
     border: none;
     cursor: text;
-    color: #333;
+    color: #757575;
   }
   
   .form:before {
@@ -110,21 +114,7 @@
     width: 17px;
     margin-top: 3px;
   }
-  
-  /* .bottom-controls {
-    position: absolute;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: white;
-    padding: 10px 20px;
-    border-radius: 999px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    z-index: 1000;
-  } */
+
   
   @media (max-width: 768px) {
     .form {
@@ -133,9 +123,6 @@
     .search-form {
       left: 10%;
     }
-    /* .bottom-controls {
-      flex-direction: column;
-    } */
   }
 
 
@@ -143,12 +130,13 @@
     position: absolute;
     top: calc(100% + 5px); 
     left: 10px;
-    width: 260px; 
+    width: 100%; 
     height: 400px;
     background: #ffffff;
     border-radius: 20px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.15);
     z-index: 900;
+    margin-top: 5px;
   }
   
   .history-popup {
@@ -352,5 +340,25 @@
     background: #E6E3DB;
     height: 6px;
     border-radius: 3px;
+  }
+  
+  .history-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  .edit-icon {
+    width: 28px;
+    height: 28px;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+    color: #DBD9D2;
+  }
+  
+  .edit-icon:hover {
+    opacity: 1;
   }
   
