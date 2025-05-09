@@ -7,7 +7,6 @@ import math
 class NaiveBayesModel:
     def __init__(self):
         self.preprocessor = TextPreprocessor()
-        self.labels = config.EMOTION_LABELS
     
     def train(self, text, label):
         """
@@ -16,9 +15,16 @@ class NaiveBayesModel:
         logger.info(f"Training Naive Bayes model with text: {text} and label: {label}")
         prepared_text = self.preprocessor.preprocess_text(text)
 
-        if label not in self.labels:
-            logger.error(f"Label '{label}' is not valid. Valid labels are: {self.labels}")
-            raise ValueError(f"Label '{label}' is not valid. Valid labels are: {self.labels}")
+        labels = requests.get(f"{config.MONGODB_SERVICE_ENDPOINTS['EMOTIONS']}").json().get("value", [])
+
+        if labels is None:
+            logger.error("No labels found in the database.")
+            raise ValueError("No labels found in the database.")
+        labels = [label["emotion"] for label in labels]
+
+        if label not in labels:
+            logger.error(f"Label '{label}' is not valid. Valid labels are: {labels}")
+            raise ValueError(f"Label '{label}' is not valid. Valid labels are: {labels}")
 
         # Increment emotion counter for calculating prior probabilities
         redis_put_url = f"{config.REDIS_SERVICE_ENDPOINTS['VALUES']}/{config.NB_WC_PREFIX}:{label}:count/{config.INCREMENT_NUMBER}"
@@ -48,19 +54,27 @@ class NaiveBayesModel:
         Predict the label for the given text using the trained Naive Bayes model.
         """
         logger.info(f"Predicting label for text: {text}")
-        labels_size = len(self.labels)
+
+        labels = requests.get(f"{config.MONGODB_SERVICE_ENDPOINTS['EMOTIONS']}").json().get("value", [])
+
+        if labels is None:
+            logger.error("No labels found in the database.")
+            raise ValueError("No labels found in the database.")
+        labels = [label["emotion"] for label in labels]
+
+        labels_size = len(labels)
         prepared_text = self.preprocessor.preprocess_text(text)
         label_scores = [0] * labels_size
 
         total_count = requests.get(f"{config.REDIS_SERVICE_ENDPOINTS['VALUES']}/{config.NB_WC_PREFIX}:total").json().get("value", 0) + 1
 
-        for i, label in enumerate(self.labels):
+        for i, label in enumerate(labels):
             redis_put_url = f"{config.REDIS_SERVICE_ENDPOINTS['VALUES']}/{config.NB_WC_PREFIX}:{label}:count/{config.INCREMENT_NUMBER}"
             label_count = requests.get(redis_put_url).json().get("value", 0) + 1
             label_scores[i] = math.log(label_count / total_count)
 
         for word in prepared_text:
-            for i, label in enumerate(self.labels):
+            for i, label in enumerate(labels):
                 redis_get_url = f"{config.REDIS_SERVICE_ENDPOINTS['VALUES']}/{config.NB_WC_PREFIX}:{label}/{word}"
                 word_count = requests.get(redis_get_url).json().get("value", 0) + 1
                 total_count = requests.get(f"{config.REDIS_SERVICE_ENDPOINTS['VALUES']}/{config.NB_WC_PREFIX}:{label}:total").json().get("value", 0) + 1
@@ -72,7 +86,7 @@ class NaiveBayesModel:
         label_scores = [math.exp(score) / total_sum for score in label_scores]
         max_score = max(label_scores)
         max_index = label_scores.index(max_score)
-        predicted_label = self.labels[max_index]
+        predicted_label = labels[max_index]
         logger.info(f"Predicted label: {predicted_label} with score: {max_score}")
 
         return predicted_label, max_score

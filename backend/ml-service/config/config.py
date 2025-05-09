@@ -6,6 +6,7 @@ MONGODB_SERVICE_ENDPOINTS = {
     "POINTS": f"http://{MONGODB_SERVICE_HOST}:{MONGODB_SERVICE_PORT}/points",
     "USERS": f"http://{MONGODB_SERVICE_HOST}:{MONGODB_SERVICE_PORT}/users",
     "CLUSTERS": f"http://{MONGODB_SERVICE_HOST}:{MONGODB_SERVICE_PORT}/clusters",
+    "EMOTIONS": f"http://{MONGODB_SERVICE_HOST}:{MONGODB_SERVICE_PORT}/emotions",
 }
 
 REDIS_SERVICE_HOST = os.getenv("REDIS_SERVICE_HOST", "redis-service")
@@ -15,8 +16,5 @@ REDIS_SERVICE_ENDPOINTS = {
 }
 
 INCREMENT_NUMBER = 1
-EMOTIONS_NUMBER = 6
-
-EMOTION_LABELS = ['sadness', 'joy', 'love', 'fear', 'anger', 'surprise']
 
 NB_WC_PREFIX = "nb:wc"
