@@ -15,7 +15,7 @@ REDIS_SERVICE_ENDPOINTS = {
 }
 
 INCREMENT_NUMBER = 1
-EMOTIONS_NUMBER = 11
+EMOTIONS_NUMBER = 6
 
 EMOTION_LABELS = ['sadness', 'joy', 'love', 'fear', 'anger', 'surprise']
 

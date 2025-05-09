@@ -69,6 +69,12 @@ async def point(request: AnalyzeRequest):
 
     return {"label": label, "score": score}
 
+@app.post("/models/analyze", response_model=AnalyzeResponse)
+async def analyze(request: AnalyzeRequest):
+    logger.info(f"Analyzing text: {request.text} for user: {request.username}")
+    label, score = app.state.naive_bayes_model.predict(request.text)
+    return {"label": label, "score": score}
+
 @app.post("/models/train")
 async def train(request: TrainRequest):
     logger.info(f"Training Naive Bayes model with text: {request.text} and label: {request.label}")
@@ -93,5 +99,29 @@ async def get_clusters(n: int = 5):
 
     clusters = json.loads(json.dumps(clusters, default=convert_numpy, skipkeys=True))
     logger.info(f"/clusters endpoint returning {len(clusters)} clusters")
+    return clusters
+
+@app.get("/clusters/{username}")
+async def get_user_clusters(username: str, n: int = 5):
+    logger.info(f"/clusters/{username} endpoint called with n={n}")
+    
+    # Get points for the specific username from the MongoDB service
+    points = requests.get(
+        f"http://{config.MONGODB_SERVICE_HOST}:{config.MONGODB_SERVICE_PORT}/points/{username}"
+    ).json()
+    
+    if not points:
+        logger.info(f"No points found for user {username}")
+        return []
+    
+    clusters = await cluster_points(points, n)
+    
+    def convert_numpy(obj):
+        if isinstance(obj, (np.integer, np.floating)):
+            return obj.item()
+        return obj
+    
+    clusters = json.loads(json.dumps(clusters, default=convert_numpy, skipkeys=True))
+    logger.info(f"/clusters/{username} endpoint returning {len(clusters)} clusters")
     return clusters
 

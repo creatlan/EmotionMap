@@ -16,6 +16,8 @@ class AuthenticationRepository:
     def get_user(self, username):
         logger.info(f"Fetching user: {username}")
         user = self.collection.find_one({"username": username})
+        if user and "_id" in user:
+            user["_id"] = str(user["_id"])
         return user
     
     def remove_user(self, username):

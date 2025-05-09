@@ -36,3 +36,13 @@
     transform: rotate(360deg);
   }
 }
+
+.login-input {
+  width: 100%;
+  max-width: 300px; /* Match the button width */
+  margin: 10px auto; /* Center align with margin */
+  padding: 10px; /* Add padding for better appearance */
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box;
+}

@@ -102,6 +102,40 @@ def delete_point(_id: str):
         raise HTTPException(status_code=500, detail="Error deleting point")
     return {"status": "ok"}
 
+class UpdatePoint(BaseModel):
+    id: str
+    text: str
+    coords: dict
+    label: str
+    score: float
+    timestamp: str
+
+@app.put("/points/")
+def update_point(point: UpdatePoint):
+    logger.info(f"Updating point")
+    try:
+        result = app.state.points_repository.update_point(
+            point_id=ObjectId(point.id),
+            text=point.text,
+            coords=point.coords,
+            label=point.label,
+            score=point.score,
+            timestamp=point.timestamp
+        )
+        
+        if not result:
+            logger.error("Point not found or not modified")
+            raise HTTPException(status_code=404, detail="Point not found or not modified")
+            
+    except ValueError:
+        logger.error("Invalid ObjectId format")
+        raise HTTPException(status_code=400, detail="Invalid ObjectId format")
+    except Exception as e:
+        logger.error(f"Error updating point: {e}")
+        raise HTTPException(status_code=500, detail="Error updating point")
+        
+    return {"status": "ok"}
+
 @app.get("/users/{username}")
 def get_user(username: str, password: str = None):
     logger.info(f"Fetching user: {username}")
@@ -115,8 +149,6 @@ def get_user(username: str, password: str = None):
             raise HTTPException(status_code=401, detail="Invalid password")
         else:
             logger.info("User found")
-        # Convert ObjectId to string for JSON serialization
-        user["_id"] = str(user["_id"])
         return user
     except Exception as e:
         logger.error(f"Error fetching user: {e}")

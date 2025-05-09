@@ -52,7 +52,7 @@ class NaiveBayesModel:
         prepared_text = self.preprocessor.preprocess_text(text)
         label_scores = [0] * labels_size
 
-        total_count = requests.get(f"{config.REDIS_SERVICE_ENDPOINTS['VALUES']}/{config.NB_WC_PREFIX}:total").json().get("value", 0)
+        total_count = requests.get(f"{config.REDIS_SERVICE_ENDPOINTS['VALUES']}/{config.NB_WC_PREFIX}:total").json().get("value", 0) + 1
 
         for i, label in enumerate(self.labels):
             redis_put_url = f"{config.REDIS_SERVICE_ENDPOINTS['VALUES']}/{config.NB_WC_PREFIX}:{label}:count/{config.INCREMENT_NUMBER}"
@@ -63,7 +63,7 @@ class NaiveBayesModel:
             for i, label in enumerate(self.labels):
                 redis_get_url = f"{config.REDIS_SERVICE_ENDPOINTS['VALUES']}/{config.NB_WC_PREFIX}:{label}/{word}"
                 word_count = requests.get(redis_get_url).json().get("value", 0) + 1
-                total_count = requests.get(f"{config.REDIS_SERVICE_ENDPOINTS['VALUES']}/{config.NB_WC_PREFIX}:{label}:total").json().get("value", 0)
+                total_count = requests.get(f"{config.REDIS_SERVICE_ENDPOINTS['VALUES']}/{config.NB_WC_PREFIX}:{label}:total").json().get("value", 0) + 1
                 if total_count > 0:
                     label_scores[i] += math.log(word_count / total_count)
 
