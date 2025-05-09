@@ -10,7 +10,6 @@ import {
 import L from "leaflet";
 import { getEmotionColor } from "./utils/colors";
 import AddPointMarker from "./components/AddPointMarker";
-import EmotionForm from "./EmotionForm";
 import "./MapComponent.css";
 
 function LocationMarker({ setSelectedCoords }) {
@@ -72,6 +71,12 @@ const MapComponent = ({
   currentUser
 }) => {
   const [clusters, setClusters] = useState([]);
+  const [editPoint, setEditPoint] = useState(null); // Define editPoint state
+  
+  const handleEditPoint = (point) => {
+    console.log("Updating editPoint with:", point);
+    setEditPoint(point);
+  };
 
   useEffect(() => {
     if (isClusterMode) {
@@ -120,11 +125,6 @@ const MapComponent = ({
             onClick={() => setSelectedCoords(null)}
           />          
           <AddPointMarker coords={selectedCoords} />
-          <EmotionForm
-            selectedCoords={selectedCoords}
-            onAdd={handleAddMarker}
-            onClose={() => setSelectedCoords(null)}
-          />
         </>
       )}
 

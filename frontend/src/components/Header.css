@@ -51,7 +51,7 @@
 }
 
 .nav-btn.user-btn {
-  background: #3a5683;
+  background: #5c8374; /* Changed from #3a5683 to #5c8374 to match login button */
   color: white;
   display: flex;
   align-items: center;
@@ -88,7 +88,7 @@
 
 .dropdown-item:hover {
   background: #f5f5f5;
-  color: #3a5683;
+  color: #5c8374; /* Changed from #3a5683 to #5c8374 to match color theme */
 }
 
 .nav-btn:hover {

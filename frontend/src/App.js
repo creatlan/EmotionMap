@@ -28,43 +28,36 @@ function AppContent() {
   const [isGlobalSearchMode, setIsGlobalSearchMode] = useState(false);
   const { currentUser } = useAuth();
 
-  useEffect(() => {
-    const loadPoints = async () => {
-      if (!currentUser) return;
-      
-      try {
-        if (isGlobalSearchMode) {
-          // Load all points in global mode
-          const res = await fetch(`http://localhost:8001/points`);
-          const data = await res.json();
-          console.log("Loaded all points (global mode):", data);
-          setMarkers(data);
-        } else {
-          // Load only user's points in personal mode
-          const res = await fetch(`http://localhost:8001/points/${currentUser.username}`);
-          const data = await res.json();
-          console.log("Loaded user points (personal mode):", data);
-          setMarkers(data);
-        }
-      } catch (err) {
-        console.error("Failed to load points:", err);
+  // Function to load points from backend
+  const loadPoints = async () => {
+    if (!currentUser) return;
+    try {
+      let res;
+      if (isGlobalSearchMode) {
+        res = await fetch(`http://localhost:8001/points`);
+      } else {
+        res = await fetch(`http://localhost:8001/points/${currentUser.username}`);
       }
-    };
+      if (!res.ok) throw new Error(`Failed to load points: ${res.status}`);
+      const data = await res.json();
+      console.log(isGlobalSearchMode ? "Loaded all points (global mode):" : "Loaded user points (personal mode):", data);
+      setMarkers(data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
     loadPoints();
   }, [currentUser, isGlobalSearchMode]);
   
-  const handleAddMarker = (point) => {
-    // Check if this is an update or creation of a new point
+  const handleAddMarker = async (point) => {
     if (point._id) {
-      // Update existing point
-      setMarkers(prev => 
-        prev.map(marker => 
-          marker._id === point._id ? point : marker
-        )
-      );
+      // Update existing point in state
+      setMarkers(prev => prev.map(marker => marker._id === point._id ? point : marker));
     } else {
-      // Add new point
-      setMarkers(prev => [...prev, point]);
+      // New point created: reload points from server to get real _id
+      await loadPoints();
     }
   };
 

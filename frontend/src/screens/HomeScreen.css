@@ -26,7 +26,7 @@
   }
   .search-form {
     position: absolute;
-    top: 60px; /* Adjusted to be 10px from the top of the map */
+    top: 70px; /* Increased from 60px to 70px for more space below header */
     left: 50px;
     z-index: 1000;
     width: 320px;
@@ -232,6 +232,7 @@
   }
   
   .map-button {
+    position: relative;
     background: white;
     border: none;
     border-radius: 50%;
@@ -244,6 +245,7 @@
     align-items: center;
     justify-content: center;
     transition: transform 0.2s ease, background 0.2s ease;
+    overflow: visible;
   }
   
   .map-button:hover {
@@ -377,4 +379,3 @@
   .edit-icon:hover {
     opacity: 1;
   }
-  

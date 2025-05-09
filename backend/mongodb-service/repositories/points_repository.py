@@ -49,14 +49,19 @@ class PointsRepository:
             "timestamp": timestamp
         }
         
-        # `POST /models/train`
-        requests.post(
-            f"http://{config.ML_SERVICE_HOST}:{config.ML_SERVICE_PORT}/models/train", 
-            json={"text": text, "label": label})
+        # Perform model training asynchronously; ignore train failures
+        try:
+            requests.post(
+                f"http://{config.ML_SERVICE_HOST}:{config.ML_SERVICE_PORT}/models/train",
+                json={"text": text, "label": label}, timeout=2
+            )
+        except Exception as train_err:
+            logger.warning(f"Model train request failed during update: {train_err}")
 
         result = self.collection.update_one(
             {"_id": point_id},
             {"$set": update_data}
         )
-        
+        if result.matched_count == 0:
+            logger.warning(f"No point found with ID: {point_id} to update")
         return result.modified_count > 0

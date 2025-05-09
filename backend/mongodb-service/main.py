@@ -103,18 +103,19 @@ def delete_point(_id: str):
     return {"status": "ok"}
 
 class UpdatePoint(BaseModel):
+    id: str
     text: str
     coords: dict
     label: str
     score: float
     timestamp: str
 
-@app.put("/points/{_id}")
-def update_point(_id: str, point: UpdatePoint):
-    logger.info(f"Updating point with ID: {_id}")
+@app.put("/points/")
+def update_point(point: UpdatePoint):
+    logger.info(f"Updating point")
     try:
         result = app.state.points_repository.update_point(
-            point_id=ObjectId(_id),
+            point_id=ObjectId(point.id),
             text=point.text,
             coords=point.coords,
             label=point.label,

@@ -221,10 +221,12 @@ const HomeScreen = ({
 
         <button className="map-button" onClick={() => window.mapZoomIn?.()}>
           <img src={plusIcon} alt="Zoom In" className="zoom-icon"/>
+          <span className="mode-tooltip">Zoom In</span>
         </button>
 
         <button className="map-button" onClick={() => window.mapZoomOut?.()}>
           <img src={minusIcon} alt="Zoom Out" className="zoom-icon"/>
+          <span className="mode-tooltip">Zoom Out</span>
         </button>
 
 

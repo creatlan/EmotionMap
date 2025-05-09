@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
-import "../EmotionForm.css"; // Reusing existing styles
+import "./LoginScreen.css"; // Use dedicated login styles
 
 const LoginScreen = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -35,59 +35,61 @@ const LoginScreen = () => {
     }
   };
   return (
-    <div className="emotion-form">
-      <h2>{isLogin ? "Login" : "Register"}</h2>
-      
-      {error && <div className="error-message">{error}</div>}
-      
-      <form onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label htmlFor="username">Username</label>
-          <input
-            type="text"
-            id="username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-          />
-        </div>
+    <div className="login-screen">
+      <div className="login-container">
+        <h2>{isLogin ? "Login" : "Register"}</h2>
         
-        <div className="form-group">
-          <label htmlFor="password">Password</label>
-          <input
-            type="password"
-            id="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
+        {error && <div className="error-message">{error}</div>}
         
-        <button 
-          type="submit" 
-          className="submit-button"
-          disabled={loading}
-        >
-          {loading ? "Processing..." : isLogin ? "Login" : "Register"}
-        </button>
-      </form>
-        <div className="toggle-form">
-        <p>
-          {isLogin 
-            ? "Don't have an account?" 
-            : "Already have an account?"}
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label htmlFor="username">Username</label>
+            <input
+              type="text"
+              id="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+            />
+          </div>
+          
+          <div className="form-group">
+            <label htmlFor="password">Password</label>
+            <input
+              type="password"
+              id="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+          
           <button 
-            className="toggle-button"
-            onClick={() => setIsLogin(!isLogin)}
+            type="submit" 
+            className="submit-button"
+            disabled={loading}
           >
-            {isLogin ? "Register" : "Login"}
+            {loading ? "Processing..." : isLogin ? "Login" : "Register"}
           </button>
-        </p>
-        <p style={{ marginTop: "15px", fontSize: "13px" }}>
-          <Link to="/" style={{ color: "#3a5683", textDecoration: "none" }}>
-            Return to home page
-          </Link>
-        </p>
+        </form>
+          <div className="toggle-form">
+          <p>
+            {isLogin 
+              ? "Don't have an account?" 
+              : "Already have an account?"}
+            <button 
+              className="toggle-button"
+              onClick={() => setIsLogin(!isLogin)}
+            >
+              {isLogin ? "Register" : "Login"}
+            </button>
+          </p>
+          <p style={{ marginTop: "15px", fontSize: "13px" }}>
+            <Link to="/" style={{ color: "#3a5683", textDecoration: "none" }}>
+              Return to home page
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );
