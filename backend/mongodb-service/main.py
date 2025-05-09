@@ -148,8 +148,6 @@ def get_user(username: str, password: str = None):
             raise HTTPException(status_code=401, detail="Invalid password")
         else:
             logger.info("User found")
-        # Convert ObjectId to string for JSON serialization
-        user["_id"] = str(user["_id"])
         return user
     except Exception as e:
         logger.error(f"Error fetching user: {e}")

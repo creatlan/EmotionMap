@@ -3,11 +3,17 @@ import MapComponent from "../MapComponent";
 import EmotionForm from "../EmotionForm";
 import Header from "../components/Header";
 import "./HomeScreen.css";
+import "./search-mode.css";
+import "./toast-notification.css";
+import "./view-indicator.css";
 import pointsIcon from "../assets/points_clust.svg";
 import clustersIcon from "../assets/circles_clust.svg";
 import plusIcon from "../assets/plus.svg";
 import minusIcon from "../assets/minus.svg";
 import editIcon from "../assets/circle_edit.svg";
+import searchModeIcon from "../assets/search_mode.svg";
+import { useAuth } from "../auth/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 
 
@@ -20,10 +26,14 @@ const HomeScreen = ({
   setClusterCount,
   isClusterMode,
   toggleMode,
+  isGlobalSearchMode,
+  setIsGlobalSearchMode,
 }) => {
-
+  const { currentUser, logout } = useAuth();
+  const navigate = useNavigate();  
+  
   const [isNewPoint, setIsNewPoint] = useState(false);
-
+  const [toast, setToast] = useState(null);
   const historyRef = useRef(null);
 
   const [showHistory, setShowHistory] = useState(false);
@@ -43,7 +53,6 @@ const HomeScreen = ({
 
   const [showControls, setShowControls] = useState(false);
   const [showClusterSelector, setShowClusterSelector] = useState(false);
-
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (historyRef.current && !historyRef.current.contains(e.target)) {
@@ -59,11 +68,38 @@ const HomeScreen = ({
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [showHistory]);
+    // Уведомление пользователя о смене режима поиска
+  useEffect(() => {
+    if (isGlobalSearchMode === undefined) return; // Skip first render
+    
+    const message = isGlobalSearchMode 
+      ? 'Switched to Global View: You can now see points from all users'
+      : 'Switched to Personal View: You can now see only your points';
+    
+    setToast(message);
+    
+    const timer = setTimeout(() => {
+      setToast(null);
+    }, 4000);
+    
+    return () => clearTimeout(timer);
+  }, [isGlobalSearchMode]);
   
-
   return (
-    <div className="home-screen">
-      <Header />
+    <div className="home-screen">      <Header />
+      
+      {toast && (
+        <div className="toast-notification">
+          {toast}
+        </div>
+      )}
+      
+      <div className="view-indicator">
+        <span className={isGlobalSearchMode ? "indicator-dot global-dot" : "indicator-dot personal-dot"}></span>
+        <span className={isGlobalSearchMode ? "global-indicator" : "personal-indicator"}>
+          {isGlobalSearchMode ? "Global View" : "Personal View"}
+        </span>
+      </div>
 
       <div className="search-form">
         <form className="form">
@@ -124,9 +160,7 @@ const HomeScreen = ({
             </div>
           </>
         )}
-      </div>
-
-      <div className="map-container">
+      </div>      <div className="map-container">
         <MapComponent
           selectedCoords={selectedCoords}
           setSelectedCoords={handleMapClick}  // handle misclick
@@ -135,6 +169,8 @@ const HomeScreen = ({
           clusterCount={clusterCount}
           isClusterMode={isClusterMode}
           handleAddMarker={handleAddMarker}
+          isGlobalSearchMode={isGlobalSearchMode}
+          currentUser={currentUser}
         />
       </div>
       {(selectedCoords && (isNewPoint || editPoint)) && (
@@ -148,26 +184,38 @@ const HomeScreen = ({
           }}
           editPoint={editPoint}
           setEditPoint={setEditPoint}
-        />
-      )}
-
-
-
-      <div className="map-controls">
-        <button className="map-button" onClick={() => console.log("Toggle My Points")}>
-          👤
-        </button>
+        />      )}      <div className="map-controls">
         <button
+          className="map-button search-mode-button"
+          onClick={() => setIsGlobalSearchMode(!isGlobalSearchMode)}
+          title={isGlobalSearchMode ? "Switch to Personal View" : "Switch to Global View"}
+        >
+          <img
+            src={searchModeIcon}
+            alt={isGlobalSearchMode ? "Global Mode" : "Personal Mode"}
+            className="search-mode-icon"
+          />
+          <span className="search-mode-indicator" style={{ 
+            backgroundColor: isGlobalSearchMode ? '#e74c3c' : '#2ecc71',
+          }}></span>
+          <span className="mode-tooltip">
+            {isGlobalSearchMode ? 'Global View' : 'Personal View'}
+          </span>
+        </button>        <button
           className="map-button"
           onClick={() => {
             toggleMode();
             setShowClusterSelector(true); 
           }}
+          title={isClusterMode ? "Switch to Points View" : "Switch to Clusters View"}
         >
           <img
             src={isClusterMode ? clustersIcon : pointsIcon}
             alt={isClusterMode ? "Clusters" : "Points"}
           />
+          <span className="mode-tooltip">
+            {isClusterMode ? 'Clusters View' : 'Points View'}
+          </span>
         </button>
 
 

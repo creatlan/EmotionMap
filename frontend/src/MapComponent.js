@@ -67,7 +67,9 @@ const MapComponent = ({
   clusterCount,
   isClusterMode,
   handleAddMarker, 
-  isNewPoint 
+  isNewPoint,
+  isGlobalSearchMode,
+  currentUser
 }) => {
   const [clusters, setClusters] = useState([]);
 
@@ -75,7 +77,16 @@ const MapComponent = ({
     if (isClusterMode) {
       const fetchClusters = async () => {
         try {
-          const res = await fetch(`http://localhost:8000/clusters?n=${clusterCount}`);
+          let url;
+          if (isGlobalSearchMode) {
+            // Fetch global clusters
+            url = `http://localhost:8000/clusters?n=${clusterCount}`;
+          } else {
+            // Fetch user-specific clusters
+            url = `http://localhost:8000/clusters/${currentUser.username}?n=${clusterCount}`;
+          }
+          
+          const res = await fetch(url);
           if (!res.ok) throw new Error(`Server responded with ${res.status}`);
           const data = await res.json();
           setClusters(data);
@@ -85,7 +96,7 @@ const MapComponent = ({
       };
       fetchClusters();
     }
-  }, [isClusterMode, clusterCount]);
+  }, [isClusterMode, clusterCount, isGlobalSearchMode, currentUser]);
 
   return (
     <MapContainer

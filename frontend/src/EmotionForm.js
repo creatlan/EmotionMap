@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import "./EmotionForm.css";
+import { useAuth } from "./auth/AuthContext";
 
 const EmotionForm = ({ selectedCoords, onAdd, onClose, editPoint, setEditPoint }) => {
   const [text, setText] = useState("");
+  const { currentUser } = useAuth();
 
   useEffect(() => {
     if (editPoint) {
@@ -13,13 +15,11 @@ const EmotionForm = ({ selectedCoords, onAdd, onClose, editPoint, setEditPoint }
   }, [editPoint]);
 
   const handleSubmit = async () => {
-    if (!selectedCoords || !text.trim()) return;
-
-    const res = await fetch("http://localhost:8000/points", {
+    if (!selectedCoords || !text.trim()) return;    const res = await fetch("http://localhost:8000/points", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        username: editPoint?.username || "test_user",
+        username: editPoint?.username || currentUser?.username,
         text,
         coords: selectedCoords,
       }),
@@ -63,11 +63,10 @@ const EmotionForm = ({ selectedCoords, onAdd, onClose, editPoint, setEditPoint }
         timestamp: timestamp
       };
       
-      onAdd(updatedCompletePoint);
-    } else {
+      onAdd(updatedCompletePoint);    } else {
       // Если создаем новую точку
       const newPoint = {
-        username: "test_user",
+        username: currentUser?.username,
         text,
         coords: selectedCoords,
         label: data.label,

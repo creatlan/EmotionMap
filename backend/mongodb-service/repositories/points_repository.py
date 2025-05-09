@@ -11,7 +11,7 @@ class PointsRepository:
     def get_points(self, username: str):
         logger.info(f"Fetching points for user: {username}")
         points = self.collection.find({"username": username}).to_list(length=None)
-        return points
+        return [{**point, "_id": str(point["_id"])} for point in points]
 
     def add_point(self, username: str, text: str, coords: dict, label: str, score: float, timestamp: str):
         logger.info(f"Adding point for user: {username}")

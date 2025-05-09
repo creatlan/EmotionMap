@@ -110,3 +110,100 @@
 .emotion-button:hover {
   background: #DBD9D2;
 }
+
+/* Login/Register form styles */
+.emotion-form {
+  width: 100%;
+  max-width: 400px;
+  margin: 80px auto;
+  padding: 30px;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  font-family: 'Roboto', sans-serif;
+}
+
+.emotion-form h2 {
+  text-align: center;
+  margin-bottom: 24px;
+  color: #3a5683;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #555;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 14px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  transition: border-color 0.2s;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #3a5683;
+}
+
+.submit-button {
+  width: 100%;
+  padding: 12px;
+  background: #3a5683;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  margin-top: 10px;
+}
+
+.submit-button:hover {
+  background: #2c4266;
+}
+
+.submit-button:disabled {
+  background: #9eacc1;
+  cursor: not-allowed;
+}
+
+.error-message {
+  background: #ffe6e6;
+  color: #d63031;
+  padding: 10px;
+  border-radius: 4px;
+  font-size: 14px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.toggle-form {
+  margin-top: 20px;
+  text-align: center;
+  font-size: 14px;
+}
+
+.toggle-button {
+  background: none;
+  border: none;
+  color: #3a5683;
+  font-weight: 500;
+  cursor: pointer;
+  margin-left: 5px;
+  font-size: 14px;
+  text-decoration: underline;
+}
+
+.toggle-button:hover {
+  color: #2c4266;
+}
