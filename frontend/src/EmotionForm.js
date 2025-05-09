@@ -12,7 +12,7 @@ const EmotionForm = ({ selectedCoords, onAdd, onClose, editPoint, setEditPoint }
   useEffect(() => {
     if (editPoint) {
       setText(editPoint.text);
-      setSelectedEmotion("auto"); // Reset to auto when editing
+      setSelectedEmotion("auto");
     } else {
       setText("");
       setSelectedEmotion("auto");
@@ -22,15 +22,13 @@ const EmotionForm = ({ selectedCoords, onAdd, onClose, editPoint, setEditPoint }
   const handleSubmit = async () => {
     if (!selectedCoords || !text.trim()) return;
     const timestamp = new Date().toISOString();
-    
+
     let label, score;
 
     if (selectedEmotion !== "auto") {
-      // User selected an emotion manually - use it directly and train the model
       label = selectedEmotion;
-      score = 1.0; // Max confidence since user selected it
+      score = 1.0;
 
-      // Send request to train the model with this text and emotion
       try {
         const trainRes = await fetch("http://localhost:8000/models/train", {
           method: "POST",
@@ -40,7 +38,7 @@ const EmotionForm = ({ selectedCoords, onAdd, onClose, editPoint, setEditPoint }
             label
           })
         });
-        
+
         if (!trainRes.ok) {
           console.warn("Model training failed, but continuing with user-selected emotion");
         } else {
@@ -48,10 +46,8 @@ const EmotionForm = ({ selectedCoords, onAdd, onClose, editPoint, setEditPoint }
         }
       } catch (err) {
         console.error("Error training model:", err);
-        // Continue with user selection even if training fails
       }
     } else {
-      // Auto mode - analyze the text to determine emotion
       try {
         const analyzeRes = await fetch("http://localhost:8000/models/analyze", {
           method: "POST",
@@ -62,12 +58,12 @@ const EmotionForm = ({ selectedCoords, onAdd, onClose, editPoint, setEditPoint }
             coords: selectedCoords
           })
         });
-        
+
         if (!analyzeRes.ok) {
           alert("Error while analyzing emotion");
           return;
         }
-        
+
         const result = await analyzeRes.json();
         label = result.label;
         score = result.score;
@@ -79,7 +75,6 @@ const EmotionForm = ({ selectedCoords, onAdd, onClose, editPoint, setEditPoint }
     }
 
     if (editPoint?._id) {
-      // Update existing point
       console.log("Sending update request with payload:", {
         id: editPoint._id,
         text,
@@ -88,7 +83,7 @@ const EmotionForm = ({ selectedCoords, onAdd, onClose, editPoint, setEditPoint }
         score,
         timestamp
       });
-      
+
       const updateRes = await fetch("http://localhost:8001/points/", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -101,23 +96,21 @@ const EmotionForm = ({ selectedCoords, onAdd, onClose, editPoint, setEditPoint }
           timestamp
         })
       });
-      
+
       if (!updateRes.ok) {
         alert("Error while updating point");
         return;
       }
-      
+
       onAdd({ ...editPoint, text, coords: selectedCoords, label, score, timestamp });
     } else {
-      // Create new point
       if (selectedEmotion === "auto") {
-        // Use the ML service to analyze and create point in one step
         console.log("Sending create request with payload:", {
           username: currentUser?.username,
           text,
           coords: selectedCoords
         });
-        
+
         const res = await fetch("http://localhost:8000/points", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -127,14 +120,14 @@ const EmotionForm = ({ selectedCoords, onAdd, onClose, editPoint, setEditPoint }
             coords: selectedCoords
           })
         });
-        
+
         if (!res.ok) {
           alert("Error while analyzing emotion");
           return;
         }
-        
+
         const data = await res.json();
-        
+
         onAdd({
           username: currentUser?.username,
           text,
@@ -144,7 +137,6 @@ const EmotionForm = ({ selectedCoords, onAdd, onClose, editPoint, setEditPoint }
           timestamp
         });
       } else {
-        // Create point with manually selected emotion
         console.log("Creating point with manually selected emotion:", {
           username: currentUser?.username,
           text,
@@ -153,7 +145,7 @@ const EmotionForm = ({ selectedCoords, onAdd, onClose, editPoint, setEditPoint }
           score,
           timestamp
         });
-        
+
         const res = await fetch("http://localhost:8001/points", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -166,12 +158,12 @@ const EmotionForm = ({ selectedCoords, onAdd, onClose, editPoint, setEditPoint }
             timestamp
           })
         });
-        
+
         if (!res.ok) {
           alert("Error while creating point");
           return;
         }
-        
+
         onAdd({
           username: currentUser?.username,
           text,
@@ -182,7 +174,7 @@ const EmotionForm = ({ selectedCoords, onAdd, onClose, editPoint, setEditPoint }
         });
       }
     }
-    
+
     setText("");
     setSelectedEmotion("auto");
     setEditPoint(null);
@@ -193,7 +185,7 @@ const EmotionForm = ({ selectedCoords, onAdd, onClose, editPoint, setEditPoint }
     if (loading || !emotions || !emotions.length) {
       return [<option key="auto" value="auto">Auto (Analyze)</option>];
     }
-    
+
     return [
       <option key="auto" value="auto">Auto (Analyze)</option>,
       ...emotions.map(emotion => (
@@ -232,7 +224,7 @@ const EmotionForm = ({ selectedCoords, onAdd, onClose, editPoint, setEditPoint }
             ✕
           </button>
         </div>
-        
+
         <div className="emotion-selector-container">
           <label htmlFor="emotion-selector">Emotion:</label>
           <select 
@@ -244,7 +236,7 @@ const EmotionForm = ({ selectedCoords, onAdd, onClose, editPoint, setEditPoint }
             {getEmotionOptions()}
           </select>
         </div>
-        
+
         <button className="emotion-button" onClick={handleSubmit}>
           {editPoint ? "Update" : (selectedEmotion === "auto" ? "Add & Analyze" : "Add & Train")}
         </button>
