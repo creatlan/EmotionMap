@@ -86,7 +86,8 @@ const HomeScreen = ({
   }, [isGlobalSearchMode]);
   
   return (
-    <div className="home-screen">      <Header />
+    <div className="home-screen">
+      <Header />
       
       {toast && (
         <div className="toast-notification">
@@ -120,47 +121,47 @@ const HomeScreen = ({
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
-          </form>
-
+        </form>
 
         {showHistory && (
           <>
             <div className="history-popup" ref={historyRef}>
               {markers.slice(0, 5).map((point, index) => (
                 <div 
-                key={index} 
-                className="history-item"
-              >
-                <div className="history-top">
-                  <div className="history-point">Point {index + 1}</div>
-                  <div className="history-label">{point.label} {Math.round(point.score * 100)}%</div>
-                </div>
-                <div className="history-bottom">
-                  <div 
-                    className="history-text" 
-                    onClick={() => handleSelectHistory(point.coords)}
-                  >
-                    {point.text}
+                  key={index} 
+                  className="history-item"
+                >
+                  <div className="history-top">
+                    <div className="history-point">Point {index + 1}</div>
+                    <div className="history-label">{point.label} {Math.round(point.score * 100)}%</div>
                   </div>
-                  <img 
-                    src={editIcon} 
-                    alt="Edit" 
-                    className="edit-icon" 
-                    onClick={() => {
-                      setEditPoint(point);
-                      setSelectedCoords(point.coords);
-                      setIsNewPoint(true);
-                      setShowHistory(false);
-                    }}                    
-                  />
+                  <div className="history-bottom">
+                    <div 
+                      className="history-text" 
+                      onClick={() => handleSelectHistory(point.coords)}
+                    >
+                      {point.text}
+                    </div>
+                    <img 
+                      src={editIcon} 
+                      alt="Edit" 
+                      className="edit-icon" 
+                      onClick={() => {
+                        setEditPoint(point);
+                        setSelectedCoords(point.coords);
+                        setIsNewPoint(true);
+                        setShowHistory(false);
+                      }}                    
+                    />
+                  </div>
                 </div>
-              </div>
-              
               ))}
             </div>
           </>
         )}
-      </div>      <div className="map-container">
+      </div>
+      
+      <div className="map-container">
         <MapComponent
           selectedCoords={selectedCoords}
           setSelectedCoords={handleMapClick}  // handle misclick
@@ -173,17 +174,23 @@ const HomeScreen = ({
           currentUser={currentUser}
         />
       </div>
+      
       {(selectedCoords && (isNewPoint || editPoint)) && (
         <EmotionForm
           selectedCoords={selectedCoords}
           onAdd={handleAddMarker}
           onClose={() => {
-            setSelectedCoords(null);            setEditPoint(null);
+            setSelectedCoords(null);
+            setEditPoint(null);
             setIsNewPoint(false);
           }}
           editPoint={editPoint}
           setEditPoint={setEditPoint}
-        />      )}      <div className="map-controls">        <button
+        />
+      )}
+      
+      <div className="map-controls">
+        <button
           className="map-button search-mode-button"
           onClick={() => setIsGlobalSearchMode(!isGlobalSearchMode)}
           title={isGlobalSearchMode ? "Switch to Personal View" : "Switch to Global View"}
@@ -192,14 +199,40 @@ const HomeScreen = ({
             src={searchModeIcon}
             alt={isGlobalSearchMode ? "Global Mode" : "Personal Mode"}
             className="search-mode-icon"
-          />          <span className="search-mode-indicator" style={{ 
+          />
+          <span className="search-mode-indicator" style={{ 
             backgroundColor: isGlobalSearchMode ? '#e74c3c' : '#2ecc71',
           }}></span>
           <span className="mode-tooltip">
             {isGlobalSearchMode ? 'Global View' : 'Personal View'}
-          </span>        
-        </button>       
-          <button
+          </span>
+        </button>
+        
+        {isClusterMode && showClusterSelector && (
+          <div className="cluster-popup-container">
+            <div className="cluster-popup">
+              <div className="cluster-header">
+                <label className="cluster-label">Clusters: {clusterCount}</label>
+                <button 
+                  className="cluster-close-btn" 
+                  onClick={() => setShowClusterSelector(false)}
+                >
+                  &times;
+                </button>
+              </div>
+
+              <input
+                type="range"
+                min="2"
+                max="10"
+                value={clusterCount}
+                onChange={(e) => setClusterCount(Number(e.target.value))}
+              />
+            </div>
+          </div>
+        )}
+        
+        <button
           className="map-button cluster-button"
           onClick={() => {
             toggleMode();
@@ -215,39 +248,16 @@ const HomeScreen = ({
             {isClusterMode ? 'Clusters View' : 'Points View'}
           </span>
         </button>
-          {isClusterMode && showClusterSelector && (
-          <div className="cluster-popup-standalone">
-            <div className="cluster-header">
-              <label className="cluster-label">Clusters: {clusterCount}</label>
-              <button 
-                className="cluster-close-btn" 
-                onClick={() => setShowClusterSelector(false)}
-                aria-label="Close cluster selector"
-              >
-                &times;
-              </button>
-            </div>
-
-            <input
-              type="range"
-              min="2"
-              max="10"
-              value={clusterCount}
-              onChange={(e) => setClusterCount(Number(e.target.value))}
-              aria-label="Adjust cluster count"
-            />
-          </div>
-        )}
-
 
         <button className="map-button" onClick={() => window.mapZoomIn?.()}>
           <img src={plusIcon} alt="Zoom In" className="zoom-icon"/>
           <span className="mode-tooltip">Zoom In</span>
-        </button><button className="map-button" onClick={() => window.mapZoomOut?.()}>
+        </button>
+        
+        <button className="map-button" onClick={() => window.mapZoomOut?.()}>
           <img src={minusIcon} alt="Zoom Out" className="zoom-icon"/>
           <span className="mode-tooltip">Zoom Out</span>
         </button>
-
       </div>
     </div>
   );
