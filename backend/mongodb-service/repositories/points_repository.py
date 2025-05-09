@@ -1,6 +1,7 @@
 from config import config as config
 from config.logger_config import logger
 from bson import ObjectId
+import requests
 
 class PointsRepository:
     def __init__(self, db):
@@ -48,6 +49,11 @@ class PointsRepository:
             "timestamp": timestamp
         }
         
+        # `POST /models/train`
+        requests.post(
+            f"http://{config.ML_SERVICE_HOST}:{config.ML_SERVICE_PORT}/models/train", 
+            json={"text": text, "label": label})
+
         result = self.collection.update_one(
             {"_id": point_id},
             {"$set": update_data}
