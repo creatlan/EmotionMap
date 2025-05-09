@@ -6,6 +6,7 @@ import LoginScreen from "./screens/LoginScreen";
 import { AuthProvider, useAuth } from "./auth/AuthContext";
 import { EmotionsProvider } from "./EmotionsContext";
 
+
 // Private route component
 const PrivateRoute = ({ children }) => {
   const { currentUser, loading } = useAuth();

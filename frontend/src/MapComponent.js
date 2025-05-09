@@ -11,6 +11,7 @@ import L from "leaflet";
 import { getEmotionColor } from "./utils/colors";
 import AddPointMarker from "./components/AddPointMarker";
 import { useEmotions, getEmotionColorSafe } from "./EmotionsContext";
+
 import "./MapComponent.css";
 
 function LocationMarker({ setSelectedCoords }) {
@@ -74,6 +75,7 @@ const MapComponent = ({
   const [clusters, setClusters] = useState([]);
   const [editPoint, setEditPoint] = useState(null); // Define editPoint state
   const { emotionColors, getColor } = useEmotions();
+
   
   const handleEditPoint = (point) => {
     console.log("Updating editPoint with:", point);

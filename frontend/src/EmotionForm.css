@@ -19,7 +19,7 @@
   bottom: 40px;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 1000;
+  z-index: 1001; /* Increased from 1000 to 1001 to ensure it's above the cluster popup */
   pointer-events: auto;
   width: 260px;
   padding: 24px 16px 16px;
