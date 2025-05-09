@@ -4,6 +4,7 @@ import HomeScreen from "./screens/HomeScreen";
 import AboutScreen from "./screens/AboutScreen"; 
 import LoginScreen from "./screens/LoginScreen";
 import { AuthProvider, useAuth } from "./auth/AuthContext";
+import { EmotionsProvider } from "./EmotionsContext";
 
 // Private route component
 const PrivateRoute = ({ children }) => {
@@ -94,7 +95,9 @@ function AppContent() {
 function App() {
   return (
     <AuthProvider>
-      <AppContent />
+      <EmotionsProvider>
+        <AppContent />
+      </EmotionsProvider>
     </AuthProvider>
   );
 }

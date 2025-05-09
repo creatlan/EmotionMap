@@ -10,6 +10,7 @@ import {
 import L from "leaflet";
 import { getEmotionColor } from "./utils/colors";
 import AddPointMarker from "./components/AddPointMarker";
+import { useEmotions, getEmotionColorSafe } from "./EmotionsContext";
 import "./MapComponent.css";
 
 function LocationMarker({ setSelectedCoords }) {
@@ -72,6 +73,7 @@ const MapComponent = ({
 }) => {
   const [clusters, setClusters] = useState([]);
   const [editPoint, setEditPoint] = useState(null); // Define editPoint state
+  const { emotionColors, getColor } = useEmotions();
   
   const handleEditPoint = (point) => {
     console.log("Updating editPoint with:", point);
@@ -133,12 +135,10 @@ const MapComponent = ({
       {isClusterMode
         ? clusters.map((cluster, i) => (
             cluster.center && cluster.center.lat !== undefined && cluster.center.lng !== undefined && (
-              <Marker
-                key={i}
-                position={[cluster.center.lat, cluster.center.lng]}
+              <Marker                key={i}                position={[cluster.center.lat, cluster.center.lng]}
                 icon={L.divIcon({
                   className: "custom-icon",
-                  html: `<div style="background:blue;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;">${cluster.points.length}</div>`
+                  html: `<div style="background:${getEmotionColorSafe(cluster.mode, emotionColors)};width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;">${cluster.points.length}</div>`
                 })}
               >
                 <Popup>
@@ -151,12 +151,10 @@ const MapComponent = ({
           ))
         : markers.map((point, i) => (
             point.coords && point.coords.lat !== undefined && point.coords.lng !== undefined && (
-              <Marker
-                key={i}
-                position={[point.coords.lat, point.coords.lng]}
+              <Marker                key={i}                position={[point.coords.lat, point.coords.lng]}
                 icon={L.divIcon({
                   className: "custom-icon",
-                  html: `<div style="background:${getEmotionColor(point.label)};width:20px;height:20px;border-radius:50%"></div>`
+                  html: `<div style="background:${getEmotionColorSafe(point.label, emotionColors)};width:20px;height:20px;border-radius:50%"></div>`
                 })}
               >
                 <Popup>

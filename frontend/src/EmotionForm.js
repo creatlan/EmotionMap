@@ -1,40 +1,85 @@
 import React, { useState, useEffect } from "react";
 import "./EmotionForm.css";
 import { useAuth } from "./auth/AuthContext";
+import { useEmotions } from "./EmotionsContext";
 
 const EmotionForm = ({ selectedCoords, onAdd, onClose, editPoint, setEditPoint }) => {
   const [text, setText] = useState("");
+  const [selectedEmotion, setSelectedEmotion] = useState("auto");
   const { currentUser } = useAuth();
+  const { emotions, loading } = useEmotions();
 
   useEffect(() => {
     if (editPoint) {
       setText(editPoint.text);
+      setSelectedEmotion("auto"); // Reset to auto when editing
     } else {
       setText("");
+      setSelectedEmotion("auto");
     }
   }, [editPoint]);
 
   const handleSubmit = async () => {
     if (!selectedCoords || !text.trim()) return;
     const timestamp = new Date().toISOString();
-    console.log("editPoint value:", editPoint);
-    console.log("editPoint._id value:", editPoint?._id);
-    if (editPoint?._id) {
-      // Edit existing point: analyze without creating a new DB entry
-      const analyzeRes = await fetch("http://localhost:8000/models/analyze", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          username: editPoint.username,
-          text,
-          coords: selectedCoords
-        })
-      });
-      if (!analyzeRes.ok) {
-        alert("Error while analyzing emotion");
+    
+    let label, score;
+
+    if (selectedEmotion !== "auto") {
+      // User selected an emotion manually - use it directly and train the model
+      label = selectedEmotion;
+      score = 1.0; // Max confidence since user selected it
+
+      // Send request to train the model with this text and emotion
+      try {
+        const trainRes = await fetch("http://localhost:8000/models/train", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            text,
+            label
+          })
+        });
+        
+        if (!trainRes.ok) {
+          console.warn("Model training failed, but continuing with user-selected emotion");
+        } else {
+          console.log("Model trained successfully with user data");
+        }
+      } catch (err) {
+        console.error("Error training model:", err);
+        // Continue with user selection even if training fails
+      }
+    } else {
+      // Auto mode - analyze the text to determine emotion
+      try {
+        const analyzeRes = await fetch("http://localhost:8000/models/analyze", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            username: editPoint ? editPoint.username : currentUser?.username,
+            text,
+            coords: selectedCoords
+          })
+        });
+        
+        if (!analyzeRes.ok) {
+          alert("Error while analyzing emotion");
+          return;
+        }
+        
+        const result = await analyzeRes.json();
+        label = result.label;
+        score = result.score;
+      } catch (err) {
+        alert("Error analyzing text");
+        console.error("Analysis error:", err);
         return;
       }
-      const { label, score } = await analyzeRes.json();
+    }
+
+    if (editPoint?._id) {
+      // Update existing point
       console.log("Sending update request with payload:", {
         id: editPoint._id,
         text,
@@ -43,11 +88,12 @@ const EmotionForm = ({ selectedCoords, onAdd, onClose, editPoint, setEditPoint }
         score,
         timestamp
       });
+      
       const updateRes = await fetch("http://localhost:8001/points/", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          id: editPoint._id, // Ensure _id is included in the payload
+          id: editPoint._id,
           text,
           coords: selectedCoords,
           label,
@@ -55,46 +101,107 @@ const EmotionForm = ({ selectedCoords, onAdd, onClose, editPoint, setEditPoint }
           timestamp
         })
       });
-      console.log("Update response status:", updateRes.status);
+      
       if (!updateRes.ok) {
         alert("Error while updating point");
         return;
       }
+      
       onAdd({ ...editPoint, text, coords: selectedCoords, label, score, timestamp });
     } else {
-      // Create new point: analyze and add via ML service
-      console.log("Sending create request with payload:", {
-        username: currentUser?.username,
-        text,
-        coords: selectedCoords
-      });
-      const res = await fetch("http://localhost:8000/points", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+      // Create new point
+      if (selectedEmotion === "auto") {
+        // Use the ML service to analyze and create point in one step
+        console.log("Sending create request with payload:", {
           username: currentUser?.username,
           text,
           coords: selectedCoords
-        })
-      });
-      console.log("Create response status:", res.status);
-      if (!res.ok) {
-        alert("Error while analyzing emotion");
-        return;
+        });
+        
+        const res = await fetch("http://localhost:8000/points", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            username: currentUser?.username,
+            text,
+            coords: selectedCoords
+          })
+        });
+        
+        if (!res.ok) {
+          alert("Error while analyzing emotion");
+          return;
+        }
+        
+        const data = await res.json();
+        
+        onAdd({
+          username: currentUser?.username,
+          text,
+          coords: selectedCoords,
+          label: data.label,
+          score: data.score,
+          timestamp
+        });
+      } else {
+        // Create point with manually selected emotion
+        console.log("Creating point with manually selected emotion:", {
+          username: currentUser?.username,
+          text,
+          coords: selectedCoords,
+          label,
+          score,
+          timestamp
+        });
+        
+        const res = await fetch("http://localhost:8001/points", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            username: currentUser?.username,
+            text,
+            coords: selectedCoords,
+            label,
+            score,
+            timestamp
+          })
+        });
+        
+        if (!res.ok) {
+          alert("Error while creating point");
+          return;
+        }
+        
+        onAdd({
+          username: currentUser?.username,
+          text,
+          coords: selectedCoords,
+          label,
+          score,
+          timestamp
+        });
       }
-      const data = await res.json();
-      onAdd({
-        username: currentUser?.username,
-        text,
-        coords: selectedCoords,
-        label: data.label,
-        score: data.score,
-        timestamp
-      });
     }
+    
     setText("");
+    setSelectedEmotion("auto");
     setEditPoint(null);
     onClose?.();
+  };
+
+  const getEmotionOptions = () => {
+    if (loading || !emotions || !emotions.length) {
+      return [<option key="auto" value="auto">Auto (Analyze)</option>];
+    }
+    
+    return [
+      <option key="auto" value="auto">Auto (Analyze)</option>,
+      ...emotions.map(emotion => (
+        <option key={emotion.emotion} value={emotion.emotion}>
+          {emotion.emotion.charAt(0).toUpperCase() + emotion.emotion.slice(1)}
+        </option>
+      ))
+    ];
   };
 
   const isActive = text.length > 0;
@@ -125,8 +232,21 @@ const EmotionForm = ({ selectedCoords, onAdd, onClose, editPoint, setEditPoint }
             ✕
           </button>
         </div>
+        
+        <div className="emotion-selector-container">
+          <label htmlFor="emotion-selector">Emotion:</label>
+          <select 
+            id="emotion-selector" 
+            value={selectedEmotion} 
+            onChange={(e) => setSelectedEmotion(e.target.value)}
+            className="emotion-selector"
+          >
+            {getEmotionOptions()}
+          </select>
+        </div>
+        
         <button className="emotion-button" onClick={handleSubmit}>
-          {editPoint ? "Update" : "Add & Analyse"}
+          {editPoint ? "Update" : (selectedEmotion === "auto" ? "Add & Analyze" : "Add & Train")}
         </button>
       </div>
     </div>
