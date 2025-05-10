@@ -7,6 +7,7 @@ const EmotionForm = ({ selectedCoords, onAdd, onClose, editPoint, setEditPoint }
   const [text, setText] = useState("");
   const [selectedEmotion, setSelectedEmotion] = useState("auto");
   const [tooltipVisible, setTooltipVisible] = useState(false);
+
   const { currentUser } = useAuth();
   const { emotions, loading } = useEmotions();
 
@@ -64,7 +65,6 @@ const EmotionForm = ({ selectedCoords, onAdd, onClose, editPoint, setEditPoint }
           alert("Error while analyzing emotion");
           return;
         }
-
         const result = await analyzeRes.json();
         label = result.label;
         score = result.score;

@@ -11,6 +11,7 @@ import L from "leaflet";
 import { getEmotionColor } from "./utils/colors";
 import AddPointMarker from "./components/AddPointMarker";
 import { useEmotions, getEmotionColorSafe } from "./EmotionsContext";
+
 import "./MapComponent.css";
 
 function LocationMarker({ setSelectedCoords }) {
