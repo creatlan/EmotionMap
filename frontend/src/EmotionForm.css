@@ -1,6 +1,83 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap');
 
 .emotion-form-wrapper {
+  position: fixed;
+  bottom: 80px;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  width: 100%;
+  max-width: 500px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Selector with tooltip styling */
+.selector-with-tooltip {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.info-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 30px;
+  background-color: rgba(242, 239, 233, 0.7);
+  color: #757575;
+  font-weight: bold;
+  margin-left: 8px;
+  cursor: help;
+  font-size: 14px;
+  border: 1px solid rgba(219, 217, 210, 0.7);
+  position: relative;
+  padding: 0;
+  user-select: none;
+}
+
+.tooltip-box {
+  position: absolute;
+  bottom: 30px;
+  left: -10px;
+  width: 280px;  background-color: rgba(0, 0, 0, 0.7);
+  border-radius: 12px;
+  padding: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  z-index: 1001;
+  font-size: 12px;
+  color: #ffffff;
+  transform-origin: bottom right;
+  animation: fadeIn 0.2s ease-in-out;
+  border: 1px solid #ddd;
+}
+
+.tooltip-box p {
+  margin: 6px 0;
+}
+
+.tooltip-box strong {
+  color: #F2EFE9;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap');
+
+.emotion-form-wrapper {
   position: absolute;
   inset: 0;
   z-index: 999;
