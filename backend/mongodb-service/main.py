@@ -47,3 +47,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(points_router)
+app.include_router(users_router)
+app.include_router(emotions_router)
+

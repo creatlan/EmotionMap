@@ -6,6 +6,8 @@ import { useEmotions } from "./EmotionsContext";
 const EmotionForm = ({ selectedCoords, onAdd, onClose, editPoint, setEditPoint }) => {
   const [text, setText] = useState("");
   const [selectedEmotion, setSelectedEmotion] = useState("auto");
+  const [tooltipVisible, setTooltipVisible] = useState(false);
+
   const { currentUser } = useAuth();
   const { emotions, loading } = useEmotions();
 
@@ -63,7 +65,6 @@ const EmotionForm = ({ selectedCoords, onAdd, onClose, editPoint, setEditPoint }
           alert("Error while analyzing emotion");
           return;
         }
-
         const result = await analyzeRes.json();
         label = result.label;
         score = result.score;
@@ -227,14 +228,27 @@ const EmotionForm = ({ selectedCoords, onAdd, onClose, editPoint, setEditPoint }
 
         <div className="emotion-selector-container">
           <label htmlFor="emotion-selector">Emotion:</label>
-          <select 
-            id="emotion-selector" 
-            value={selectedEmotion} 
-            onChange={(e) => setSelectedEmotion(e.target.value)}
-            className="emotion-selector"
-          >
-            {getEmotionOptions()}
-          </select>
+          <div className="selector-with-tooltip">
+            <select 
+              id="emotion-selector" 
+              value={selectedEmotion} 
+              onChange={(e) => setSelectedEmotion(e.target.value)}
+              className="emotion-selector"
+            >
+              {getEmotionOptions()}
+            </select>            <div 
+              className="info-icon" 
+              onMouseEnter={() => setTooltipVisible(true)}              onMouseLeave={() => setTooltipVisible(false)}
+            >
+              <span style={{ display: 'inline-block', lineHeight: '20px' }}>?</span>              {tooltipVisible && (
+                <div className="tooltip-box">
+                  <p><strong>Auto (Analyze):</strong> Using auto you use Naive Bayes algorithm. It calculates a probability of all emotions based on your words and takes the highest one.</p>
+                  <p><strong>Manual selection:</strong> Choose an emotion manually to help train the AI.</p>
+                  <p>When you select an emotion manually, it helps our AI learn and improve!</p>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
 
         <button className="emotion-button" onClick={handleSubmit}>
