@@ -126,7 +126,11 @@ const HomeScreen = ({
         {showHistory && (
           <>
             <div className="history-popup" ref={historyRef}>
-              {markers.slice(0, 5).map((point, index) => (
+            {markers
+              .filter(p => p.username === currentUser?.username)
+              .reverse()
+              .map((point, index) => (
+
                 <div 
                 key={index} 
                 className="history-item"

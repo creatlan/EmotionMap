@@ -207,7 +207,7 @@ const EmotionForm = ({ selectedCoords, onAdd, onClose, editPoint, setEditPoint }
           <textarea
             id="emotion-textarea"
             className="input-field"
-            rows="1"
+            rows="3"
             value={text}
             maxLength={500}
             onChange={(e) => setText(e.target.value)}
