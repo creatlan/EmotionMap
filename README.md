@@ -76,6 +76,33 @@ EmotionMap/
   - Dynamic light/dark theme.
 - **Dockerfile**: Located in `frontend/Dockerfile`.
 
+## Data Analysis for Pretraining
+
+The `data-analysis` module contains scripts and datasets for preparing and pretraining the emotion analysis models. Follow these steps to use it:
+
+1. **Prepare the Dataset**:
+   - Ensure the `emotions_data.txt` file is present in the `data-analysis` directory. This file should contain a JSON array of objects with `text` and `label` fields.
+
+2. **Filter and Upload Data to MongoDB**:
+   - Run the `filling.py` script to filter the dataset and upload points to the MongoDB service.
+     ```bash
+     python backend/data-analysis/filling.py
+     ```
+   - This script filters the dataset to ensure a balanced distribution of labels and uploads the filtered points to the MongoDB service.
+
+3. **Train the Model**:
+   - The same script (`filling.py`) also sends the data to the ML service for training the Naive Bayes model.
+   - Ensure the ML service is running before executing the script.
+
+4. **Verify Results**:
+   - Check the logs printed by the script to confirm successful data insertion and model training.
+
+5. **Dependencies**:
+   - The script requires the `requests` library. Install it using:
+     ```bash
+     pip install requests
+     ```
+
 ## Running the Project
 
 ### Prerequisites
