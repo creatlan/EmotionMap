@@ -25,7 +25,6 @@ export const EmotionsProvider = ({ children }) => {
         if (data.value && Array.isArray(data.value)) {
           setEmotions(data.value);
           
-          // Create a map of emotion to color
           const colorMap = {};
           data.value.forEach(item => {
             colorMap[item.emotion] = item.color;
@@ -53,7 +52,6 @@ export const EmotionsProvider = ({ children }) => {
       emotionColors, 
       loading, 
       error,
-      // Add a helper function to get color directly
       getColor: (emotion) => emotionColors[emotion] || null
     }}>
       {children}
@@ -63,14 +61,12 @@ export const EmotionsProvider = ({ children }) => {
 
 export default EmotionsContext;
 
-// Add a utility function to get emotion color with error handling
 export const getEmotionColorSafe = (label, emotionColors, defaultColor = "#7F7F7F") => {
   if (!label) return defaultColor;
   
   if (emotionColors && emotionColors[label]) {
     return emotionColors[label];
   }
-    // Fallback colors from config
   const defaultColors = {
     joy: "#FF7F0E",      // Orange
     sadness: "#1F77B4",  // Blue

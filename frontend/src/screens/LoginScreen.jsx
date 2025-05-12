@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
-import "./LoginScreen.css"; // Use dedicated login styles
+import "./LoginScreen.css";
 
 const LoginScreen = () => {
   const [isLogin, setIsLogin] = useState(true);

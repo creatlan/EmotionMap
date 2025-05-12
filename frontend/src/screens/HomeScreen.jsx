@@ -40,6 +40,8 @@ const HomeScreen = ({
 
   const [editPoint, setEditPoint] = useState(null);
 
+  const [searchTerm, setSearchTerm] = useState("");
+
   const handleMapClick = (coords) => {
     setSelectedCoords(coords);
     setIsNewPoint(true);
@@ -85,6 +87,15 @@ const HomeScreen = ({
     return () => clearTimeout(timer);
   }, [isGlobalSearchMode]);
   
+  const filteredMarkers = isGlobalSearchMode
+  ? markers.filter(p =>
+      p.label.toLowerCase().includes(searchTerm)
+    )
+  : markers.filter(p =>
+      p.username === currentUser?.username &&
+      p.label.toLowerCase().includes(searchTerm)
+    );
+
   return (
     <div className="home-screen">      <Header />
       
@@ -111,11 +122,11 @@ const HomeScreen = ({
           <input 
             className="input" 
             placeholder="Type your text..." 
-            required 
-            type="text" 
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value.toLowerCase())}
             onFocus={() => setShowHistory(true)}
           />
-          <button className="reset" type="reset">
+          <button className="reset" type="reset" onClick={() => setSearchTerm("")}>
             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -126,8 +137,7 @@ const HomeScreen = ({
         {showHistory && (
           <>
             <div className="history-popup" ref={historyRef}>
-            {markers
-              .filter(p => p.username === currentUser?.username)
+            {filteredMarkers
               .reverse()
               .map((point, index) => (
 
@@ -169,7 +179,7 @@ const HomeScreen = ({
           selectedCoords={selectedCoords}
           setSelectedCoords={handleMapClick}  // handle misclick
           isNewPoint={isNewPoint} 
-          markers={markers}
+          markers={filteredMarkers}
           clusterCount={clusterCount}
           isClusterMode={isClusterMode}
           handleAddMarker={handleAddMarker}

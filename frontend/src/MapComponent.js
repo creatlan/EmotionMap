@@ -52,9 +52,19 @@ function MapControlBridge() {
     window.mapZoomIn = () => map.setZoom(map.getZoom() + 1);
     window.mapZoomOut = () => map.setZoom(map.getZoom() - 1);
 
+    window.mapFlyTo = (coords) => {
+      if (coords && coords.lat !== undefined && coords.lng !== undefined) {
+        map.flyTo([coords.lat, coords.lng], 13, {
+          animate: true,
+          duration: 1.5,
+        });
+      }
+    };
+
     return () => {
       delete window.mapZoomIn;
       delete window.mapZoomOut;
+      delete window.mapFlyTo;
     };
   }, [map]);
 
