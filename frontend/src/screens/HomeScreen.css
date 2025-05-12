@@ -148,10 +148,19 @@
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     border-radius: 30px;
     padding: 10px;
-    max-height: 1000%;
+    max-height: 300px;
     overflow-y: auto;
     animation: slideDown 0.25s ease;
     z-index: 1000;
+  }
+
+  .history-popup::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .history-popup::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+    border-radius: 6px;
   }
 
   @keyframes slideDown {
